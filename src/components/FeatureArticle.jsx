@@ -3,6 +3,7 @@ import { motion as Motion } from 'motion/react'
 import { FEATURE_PORTFOLIO_YOUTUBE_ID } from '../data/content'
 import { useTimelineLayout } from '../hooks/useTimelineLayout'
 import { parseYouTubeVideoId } from '../utils/parseYouTubeVideoId'
+import FitBox from './FitBox'
 
 const featureYoutubeEmbedId = parseYouTubeVideoId(FEATURE_PORTFOLIO_YOUTUBE_ID)
 
@@ -25,9 +26,34 @@ function CheckpointCard({ cp }) {
           {cp.image && <img src={cp.image} alt={cp.title} />}
         </div>
         <div className="checkpoint-content">
-          <span className="smallcaps">{cp.year}</span>
-          <h4>{cp.title}</h4>
-          <p>{cp.body}</p>
+          <FitBox
+            element="span"
+            className="smallcaps"
+            maxFontSize={12}
+            scale={0.85}
+            containerStyle={{ flex: '0 0 auto', minHeight: 0, overflow: 'hidden' }}
+            textStyle={{ margin: 0, display: 'block' }}
+          >
+            {cp.year}
+          </FitBox>
+          <FitBox
+            element="h4"
+            maxFontSize={24}
+            scale={0.85}
+            containerStyle={{ flex: '1 1 0', minHeight: 0, overflow: 'hidden' }}
+            textStyle={{ margin: 0, lineHeight: 1.22, fontFamily: 'var(--font-display)', fontWeight: 700 }}
+          >
+            {cp.title}
+          </FitBox>
+          <FitBox
+            element="p"
+            maxFontSize={14}
+            scale={0.82}
+            containerStyle={{ flex: '1.5 1 0', minHeight: 0, overflow: 'hidden' }}
+            textStyle={{ margin: 0, lineHeight: 1.6, color: 'var(--muted)' }}
+          >
+            {cp.body}
+          </FitBox>
         </div>
       </Motion.div>
     </div>
@@ -162,10 +188,30 @@ export default function FeatureArticle({ copy }) {
       viewport={{ once: true, amount: .1 }}
     >
       <div className="article-pad feature-article-pad" ref={articlePadRef}>
-        <div className="article-head">
+        <div className="feature-article-head">
           <span className="smallcaps">{copy.eyebrow}</span>
-          <h3 className="article-title">{copy.title}</h3>
-          <p className="article-deck">{copy.deck}</p>
+
+          <FitBox
+            element="h3"
+            maxFontSize={66}
+            scale={0.82}
+            containerStyle={{ flex: '1.5 1 0', minHeight: 0, overflow: 'hidden' }}
+            textStyle={{ lineHeight: 1.05, letterSpacing: 'clamp(0.048rem, 0.034rem + 0.22cqw, 0.104rem)', fontWeight: 700, margin: 0, fontFamily: 'var(--font-display)' }}
+            className="article-title"
+          >
+            {copy.title}
+          </FitBox>
+
+          <FitBox
+            element="p"
+            maxFontSize={18}
+            scale={0.82}
+            containerStyle={{ flex: '1 1 0', minHeight: 0, overflow: 'hidden' }}
+            textStyle={{ lineHeight: 1.45, color: 'var(--muted)', margin: 0 }}
+            className="article-deck"
+          >
+            {copy.deck}
+          </FitBox>
         </div>
 
         <div className="feature-video-wrap">
@@ -185,11 +231,36 @@ export default function FeatureArticle({ copy }) {
               </p>
             )}
           </div>
-          <div className="caption caption--below-video">
-            <strong>{copy.videoLabel}</strong>
-            <span>{copy.videoMeta}</span>
+          <div className="caption caption--below-video feature-video-caption">
+            <FitBox
+              element="strong"
+              maxFontSize={14}
+              scale={0.85}
+              containerStyle={{ flex: '0 0 auto', minHeight: 0, overflow: 'hidden' }}
+              textStyle={{ margin: 0, display: 'block' }}
+            >
+              {copy.videoLabel}
+            </FitBox>
+            <FitBox
+              element="span"
+              maxFontSize={13}
+              scale={0.85}
+              containerStyle={{ flex: '0 0 auto', minHeight: 0, overflow: 'hidden' }}
+              textStyle={{ margin: 0, display: 'block', color: 'var(--muted)' }}
+            >
+              {copy.videoMeta}
+            </FitBox>
+            <FitBox
+              element="p"
+              maxFontSize={16}
+              scale={0.82}
+              containerStyle={{ flex: '1 1 0', minHeight: 0, overflow: 'hidden' }}
+              textStyle={{ lineHeight: 1.75, color: 'var(--muted)', margin: 0 }}
+              className="feature-body-copy"
+            >
+              {copy.body}
+            </FitBox>
           </div>
-          <p className="feature-body-copy">{copy.body}</p>
         </div>
 
         {showTimeline && (

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AnimatePresence, motion as Motion } from 'motion/react'
+import FitBox from './FitBox'
 
 /* Must match .page width in public/cv-preview.html (210mm ≈ 794px) */
 const CV_NATURAL_W = 794
@@ -35,6 +36,52 @@ const ICONS = {
   linkedin: LinkedInIcon,
   github: GitHubIcon,
   email: EmailIcon,
+}
+
+function FitCardBody({ label, text, desc }) {
+  const containerStyle = { height: '100%', minHeight: 0, overflow: 'hidden' }
+  const textStyle = { height: '100%', display: 'block', textAlign: 'right' }
+
+  return (
+    <div className="profile-card-body">
+      <div className="profile-card-label-wrap">
+        <FitBox
+          element="span"
+          className="profile-card-label"
+          maxFontSize={36}
+          minFontSize={6}
+          containerStyle={containerStyle}
+          textStyle={textStyle}
+        >
+          {label}
+        </FitBox>
+      </div>
+      <div className="profile-card-text-wrap">
+        <FitBox
+          element="span"
+          className="profile-card-text"
+          maxFontSize={48}
+          minFontSize={7}
+          containerStyle={containerStyle}
+          textStyle={textStyle}
+        >
+          {text}
+        </FitBox>
+      </div>
+      <div className="profile-card-desc-wrap">
+        <FitBox
+          element="span"
+          className="profile-card-desc"
+          maxFontSize={32}
+          minFontSize={6}
+          containerStyle={containerStyle}
+          textStyle={textStyle}
+        >
+          {desc}
+        </FitBox>
+      </div>
+    </div>
+  )
 }
 
 const cardVariants = {
@@ -136,11 +183,7 @@ function CertificatesExpandable({ item, certs, index }) {
             <div className="profile-card-icon">
               <DocumentIcon />
             </div>
-            <div className="profile-card-body">
-              <span className="profile-card-label">{item.label}</span>
-              <span className="profile-card-text">{item.text}</span>
-              <span className="profile-card-desc">{item.description}</span>
-            </div>
+            <FitCardBody label={item.label} text={item.text} desc={item.description} />
           </Motion.button>
         ) : (
           <Motion.div
@@ -221,14 +264,32 @@ export default function ContactArticle({ copy }) {
       viewport={{ once: true, amount: .1 }}
     >
       <div className="article-pad article-pad--contact">
-        {/* Welcome message */}
         <div className="contact-welcome">
           <span className="smallcaps">{copy.eyebrow}</span>
-          <h3 className="article-title">{copy.title}</h3>
-          <p className="article-deck">{copy.deck}</p>
+
+          <FitBox
+            element="h3"
+            maxFontSize={66}
+            scale={0.82}
+            containerStyle={{ flex: '1.5 1 0', minHeight: 0, overflow: 'hidden' }}
+            textStyle={{ lineHeight: 1.05, letterSpacing: 'clamp(0.048rem, 0.034rem + 0.22cqw, 0.104rem)', fontWeight: 700, margin: 0, fontFamily: 'var(--font-display)' }}
+            className="article-title"
+          >
+            {copy.title}
+          </FitBox>
+
+          <FitBox
+            element="p"
+            maxFontSize={18}
+            scale={1}
+            containerStyle={{ flex: '1 1 0', minHeight: 0, overflow: 'hidden' }}
+            textStyle={{ lineHeight: 1.45, color: 'var(--muted)', margin: 0 }}
+            className="article-deck"
+          >
+            {copy.deck}
+          </FitBox>
         </div>
 
-        {/* Branded profile cards */}
         <div className="profile-cards">
           {copy.items.map((item, i) => {
             if (item.brand === 'certificates' && copy.certificates) {
@@ -263,56 +324,52 @@ export default function ContactArticle({ copy }) {
                 <div className="profile-card-icon">
                   <Icon />
                 </div>
-                <div className="profile-card-body">
-                  <span className="profile-card-label">{item.label}</span>
-                  <span className="profile-card-text">{item.text}</span>
-                  <span className="profile-card-desc">{item.description}</span>
-                </div>
+                <FitCardBody label={item.label} text={item.text} desc={item.description} />
               </Motion.a>
             )
           })}
-        </div>
 
-        <div className="cv-preview-pane-wrap">
-          <div className="cv-preview-pane-container">
-            <Motion.a
-              href={copy.cvHref}
-              className="cv-preview-pane"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Open full CV on kamenkarchev.com"
-              whileHover={{ y: -6, scale: 1.012 }}
-              whileTap={{ scale: 0.99 }}
-              transition={{ duration: .22, ease: [.16, 1, .3, 1] }}
-            >
-              <div className="cv-preview-pane__scaler-wrap">
-                <div ref={clipRef} className="cv-preview-pane__scale-clip">
-                  <iframe
-                    className="cv-preview-pane__iframe"
-                    src="/cv-preview.html"
-                    scrolling="no"
-                    tabIndex={-1}
-                    aria-hidden="true"
-                    title=""
-                    style={{
-                      width: CV_NATURAL_W,
-                      height: layout.iframeH,
-                      transform: `scale(${layout.scale})`,
-                      transformOrigin: 'top left',
-                    }}
-                  />
+          <div className="cv-preview-pane-wrap">
+            <div className="cv-preview-pane-container">
+              <Motion.a
+                href={copy.cvHref}
+                className="cv-preview-pane"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Open full CV on kamenkarchev.com"
+                whileHover={{ y: -6, scale: 1.012 }}
+                whileTap={{ scale: 0.99 }}
+                transition={{ duration: .22, ease: [.16, 1, .3, 1] }}
+              >
+                <div className="cv-preview-pane__scaler-wrap">
+                  <div ref={clipRef} className="cv-preview-pane__scale-clip">
+                    <iframe
+                      className="cv-preview-pane__iframe"
+                      src="/cv-preview.html"
+                      scrolling="no"
+                      tabIndex={-1}
+                      aria-hidden="true"
+                      title=""
+                      style={{
+                        width: CV_NATURAL_W,
+                        height: layout.iframeH,
+                        transform: `scale(${layout.scale})`,
+                        transformOrigin: 'top left',
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className="cv-preview-pane__fade" aria-hidden="true" />
-              <div className="cv-preview-pane__cta" aria-hidden="true">
-                <div className="cv-preview-pane__cta-icon"><DocumentIcon /></div>
-                <div className="cv-preview-pane__cta-body">
-                  <span className="cv-preview-pane__cta-label">CV</span>
-                  <span className="cv-preview-pane__cta-text">Click to view my full CV</span>
-                  <span className="cv-preview-pane__cta-desc">kamenkarchev.com/cv</span>
+                <div className="cv-preview-pane__fade" aria-hidden="true" />
+                <div className="cv-preview-pane__cta" aria-hidden="true">
+                  <div className="cv-preview-pane__cta-icon"><DocumentIcon /></div>
+                  <div className="cv-preview-pane__cta-body">
+                    <span className="cv-preview-pane__cta-label">CV</span>
+                    <span className="cv-preview-pane__cta-text">Click to view my full CV</span>
+                    <span className="cv-preview-pane__cta-desc">kamenkarchev.com/cv</span>
+                  </div>
                 </div>
-              </div>
-            </Motion.a>
+              </Motion.a>
+            </div>
           </div>
         </div>
       </div>

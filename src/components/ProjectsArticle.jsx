@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from 'react'
 import { motion as Motion } from 'motion/react'
 import { getProjectCards } from '../utils/v3'
 import { measureProjectFitPretext } from '../utils/measureProjectFitPretext'
+import FitBox from './FitBox'
 
 /** @param {{ id: string, startx: number, starty: number, width: number, height: number }[]} cards */
 function cardsToRects(cards) {
@@ -95,10 +96,28 @@ export default function ProjectsArticle({ copy }) {
       viewport={{ once: true, amount: .1 }}
     >
       <div className="article-pad article-pad--projects">
-        <div className="article-head">
+        <div className="projects-article-head">
           <span className="smallcaps">{copy.eyebrow}</span>
-          <h3 className="article-title">{copy.title}</h3>
-          <p className="article-deck">{copy.deck}</p>
+          <FitBox
+            element="h3"
+            maxFontSize={66}
+            scale={0.82}
+            containerStyle={{ flex: '1.5 1 0', minHeight: 0, overflow: 'hidden' }}
+            textStyle={{ lineHeight: 1.05, letterSpacing: 'clamp(0.048rem, 0.034rem + 0.22cqw, 0.104rem)', fontWeight: 700, margin: 0, fontFamily: 'var(--font-display)' }}
+            className="article-title"
+          >
+            {copy.title}
+          </FitBox>
+          <FitBox
+            element="p"
+            maxFontSize={18}
+            scale={0.82}
+            containerStyle={{ flex: '1 1 0', minHeight: 0, overflow: 'hidden' }}
+            textStyle={{ lineHeight: 1.45, color: 'var(--muted)', margin: 0 }}
+            className="article-deck"
+          >
+            {copy.deck}
+          </FitBox>
         </div>
 
         {/* projects-layout fills remaining flex space (flex: 1 1 0 in CSS) */}
