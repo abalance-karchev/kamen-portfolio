@@ -1036,8 +1036,14 @@ img { display: block; max-width: 100%; }
   flex: 1 1 0;
   display: flex;
   flex-direction: column;
+  gap: .3rem;
   min-height: 0;
   overflow: hidden;
+}
+.project-content > div {
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
 }
 
 /* Portrait tile (h ≥ w): column layout, image on top */
@@ -1063,16 +1069,17 @@ img { display: block; max-width: 100%; }
   line-height: 0.95;
   letter-spacing: clamp(0.048rem, 0.032rem + 0.28cqw, 0.104rem);
   font-weight: 700;
-  margin: 0 0 clamp(0.28rem, 0.16rem + 0.48cqh, 0.44rem);
+  margin: 0;
 }
 .projects-item--last .project-title {
   font-size: clamp(0.736rem, 0.36rem + 2cqw + 0.8cqh, 1.2rem);
 }
 .project-body {
+  /* font-size driven by FitBox inline style; CSS value is a fallback only */
   font-size: clamp(0.704rem, 0.4rem + 1.76cqw + 0.72cqh, calc(1.2rem + 2px));
   line-height: 1.6;
   color: var(--muted);
-  margin: 0 0 clamp(0.48rem, 0.32rem + 0.64cqh, 0.72rem);
+  margin: 0;
 }
 .mini-visual {
   height: 120px;

@@ -47,7 +47,7 @@ function CheckpointCard({ cp }) {
           </FitBox>
           <FitBox
             element="p"
-            maxFontSize={14}
+            maxFontSize={22}
             scale={0.82}
             containerStyle={{ flex: '1.5 1 0', minHeight: 0, overflow: 'hidden' }}
             textStyle={{ margin: 0, lineHeight: 1.6, color: 'var(--muted)' }}

@@ -18,7 +18,6 @@ export default function ProjectsArticle({ copy }) {
   const containerRef = useRef(null)
   const [rects,   setRects]   = useState({})
   const [skipped, setSkipped] = useState(new Set())
-  const [flags,   setFlags]   = useState({})
 
   const projects = copy.items
 
@@ -54,29 +53,8 @@ export default function ProjectsArticle({ copy }) {
         }
       }
 
-      // ── Measure all content flags against the final layout ────────────────
-      const finalSkipped = new Set(titleSkipped)
-      const nextFlags    = {}
-
-      const visibleOrdered = projects.filter(p => !titleSkipped.has(p.id) && finalRects[p.id])
-      const lastId =
-        visibleOrdered.length > 0 ? visibleOrdered[visibleOrdered.length - 1].id : null
-
-      for (const p of projects) {
-        if (finalSkipped.has(p.id)) continue
-        const r = finalRects[p.id]
-        if (!r) continue
-        const fit = measureProjectFitPretext(p, r, { isLast: p.id === lastId })
-        if (!fit.titleFits) {
-          finalSkipped.add(p.id)
-          continue
-        }
-        nextFlags[p.id] = { showBody: fit.showBody, showTags: fit.showTags }
-      }
-
       setRects(finalRects)
-      setSkipped(finalSkipped)
-      setFlags(nextFlags)
+      setSkipped(titleSkipped)
     }
 
     run()
@@ -129,7 +107,6 @@ export default function ProjectsArticle({ copy }) {
             if (skipped.has(p.id)) return null
             const b = rects[p.id]
             if (!b) return null
-            const f        = flags[p.id] ?? { showBody: true, showTags: true }
             const isLast   = p.id === lastId
             const isLandscape = b.w > b.h
 
@@ -164,11 +141,17 @@ export default function ProjectsArticle({ copy }) {
                   <div className="project-content">
                     <h4 className="project-title">{p.title}</h4>
 
-                    {f.showBody && (
-                      <p className="project-body">{p.body}</p>
-                    )}
+                    <FitBox
+                      element="p"
+                      maxFontSize={21}
+                      containerStyle={{ flex: '1 1 0', minHeight: 0, overflow: 'hidden' }}
+                      textStyle={{ lineHeight: 1.6, color: 'var(--muted)', margin: 0 }}
+                      className="project-body"
+                    >
+                      {p.body}
+                    </FitBox>
 
-                    {f.showTags && (
+                    {p.tags?.length > 0 && (
                       <div className="tags">
                         {p.tags.map(t => <span className="tag" key={t}>{t}</span>)}
                       </div>
