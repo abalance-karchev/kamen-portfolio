@@ -59,6 +59,16 @@ const EN_TIMELINE = [
  */
 const EN_PROJECTS = [
   {
+    id: 'history-interactive',
+    title: 'History Interactive',
+    // Highest value in the list: the treemap sizes by this, and this is the
+    // current flagship. No image yet — the card renders text-only until one exists.
+    value: 30,
+    body: 'A platform for map generation and community interaction, built for the Rewriting History channel. An Elixir/Phoenix backend serves a normalized, resource-oriented REST API over PostgreSQL, with a Wikidata-backed asset pipeline resolving national flags by date. The browser client renders territory straight from SVG, computes union geometry client-side with Clipper, and caches the results server-side so a scenario only pays for that work once.',
+    tags: ['Elixir', 'Phoenix', 'PostgreSQL', 'REST API', 'SVG', 'In progress'],
+    link: 'https://github.com/KamenKarchev',
+  },
+  {
     id: 'winery',
     title: 'Winery',
     value: 15,
@@ -232,6 +242,14 @@ const BG_TIMELINE = [
 ]
 
 const BG_PROJECTS = [
+  {
+    id: 'history-interactive',
+    title: 'History Interactive',
+    value: 30,
+    body: 'Платформа за генериране на карти и общностно взаимодействие, изградена за канала Rewriting History. Backend на Elixir/Phoenix предоставя нормализиран, ресурсно ориентиран REST API върху PostgreSQL, с asset pipeline на база Wikidata, който разрешава националните знамена по дата. Клиентът в браузъра рендира територии директно от SVG, изчислява обединената геометрия локално с Clipper и кешира резултата на сървъра, така че всеки сценарий плаща тази цена само веднъж.',
+    tags: ['Elixir', 'Phoenix', 'PostgreSQL', 'REST API', 'SVG', 'В процес'],
+    link: 'https://github.com/KamenKarchev',
+  },
   {
     id: 'winery',
     title: 'Winery',
