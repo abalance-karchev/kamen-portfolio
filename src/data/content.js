@@ -405,6 +405,16 @@ export const CONTENT = {
       portraitAlt: 'Kamen Karchev portrait',
       portraitName: 'Kamen Karchev',
       portraitMeta: 'Software engineering student · Varna, Bulgaria',
+      // "Currently building" bar. The live styling is a metaphor for active
+      // work — deliberately no viewer counts, no "live now", no launch date,
+      // because none of those would be true.
+      building: {
+        status: 'Currently building',
+        title: 'History Interactive',
+        blurb: 'A platform for map generation and community interaction',
+        channelLabel: 'For the channel',
+        channel: 'Rewriting History',
+      },
       pullQuote: '"Curious by nature, creative by habit — I build things I would actually want to use."',
       quickCards: [
         { label: 'Role', value: 'Full-stack · backend focus' },
@@ -502,6 +512,13 @@ export const CONTENT = {
       portraitAlt: 'Портрет на Камен Карчев',
       portraitName: 'Камен Карчев',
       portraitMeta: 'Студент по софтуерно инженерство · Варна, България',
+      building: {
+        status: 'В момента изграждам',
+        title: 'History Interactive',
+        blurb: 'Платформа за генериране на карти и общностно взаимодействие',
+        channelLabel: 'За канала',
+        channel: 'Rewriting History',
+      },
       pullQuote: '"Любопитен по природа, креативен по навик — изграждам неща, които самият аз бих искал да използвам."',
       quickCards: [
         { label: 'Роля', value: 'Full-stack · backend фокус' },

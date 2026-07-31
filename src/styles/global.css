@@ -358,7 +358,9 @@ img { display: block; max-width: 100%; }
   max-width: min(95vw, 100%);
   margin: 0 auto;
 }
-.hero-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 1.2rem; padding: 1.4rem 0 0; }
+/* Row 2 is the building banner: auto-sized, so the panels absorb its height
+   inside #hero's fixed 90vh rather than pushing content below the fold. */
+.hero-grid { display: grid; grid-template-columns: 1.15fr .85fr; grid-template-rows: 1fr auto; gap: 1.2rem; padding: 1.4rem 0 0; }
 .hero-copy.glass,
 .hero-side.glass {
   container-type: size;
@@ -482,6 +484,95 @@ img { display: block; max-width: 100%; }
   font-style: italic;
   font-weight: 600;
   letter-spacing: clamp(0.048rem, 0.036rem + 0.06cqw, 0.104rem);
+}
+
+/* ── "CURRENTLY BUILDING" BANNER ──
+   Proportioned like a live video bar: full hero width, deliberately short. It
+   is an accent on the hero, not a second hero — if it ever starts competing
+   with the portrait for attention, shrink the height clamp rather than growing
+   it. Small text uses solid mid-tones; the gradient is decoration only. */
+.building-banner {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: clamp(.6rem, 1.4cqi, 1.1rem);
+  min-height: clamp(44px, 6vh, 62px);
+  padding: .5rem clamp(.75rem, 2cqi, 1.15rem);
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background:
+    var(--accent-gradient) top / 100% 2px no-repeat,
+    color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  font-family: var(--font-tech);
+}
+.building-banner__indicator {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.building-banner__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--primary-soft);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-soft) 26%, transparent);
+}
+.building-banner__status {
+  flex-shrink: 0;
+  font-size: clamp(0.5rem, 0.42rem + 0.5cqi, 0.6rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.building-banner__body {
+  display: flex;
+  align-items: baseline;
+  gap: .55rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+}
+.building-banner__title {
+  font-size: clamp(0.7rem, 0.6rem + 0.6cqi, 0.86rem);
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.building-banner__blurb {
+  font-size: clamp(0.6rem, 0.52rem + 0.5cqi, 0.72rem);
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.building-banner__channel {
+  display: flex;
+  align-items: baseline;
+  gap: .4rem;
+  flex-shrink: 0;
+  padding-left: clamp(.6rem, 1.4cqi, 1.1rem);
+  border-left: 1px solid var(--line);
+}
+.building-banner__channel-label {
+  font-size: clamp(0.5rem, 0.42rem + 0.5cqi, 0.6rem);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.building-banner__channel-name {
+  font-size: clamp(0.62rem, 0.54rem + 0.5cqi, 0.76rem);
+  font-weight: 600;
+  font-style: italic;
+  white-space: nowrap;
 }
 
 /* SECTION HEAD */
@@ -1515,6 +1606,11 @@ img { display: block; max-width: 100%; }
     height: auto;
   }
   .hero-copy h2  { max-width: none; }
+
+  /* Narrow screens: the channel credit is the first thing to go — the blurb
+     carries the actual information. */
+  .building-banner__blurb  { display: none; }
+  .building-banner__channel-label { display: none; }
 
   /* ── Masthead: collapse side columns, keep title centred ── */
   .masthead-top    { grid-template-columns: 0 1fr 0; }

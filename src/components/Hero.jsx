@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react'
 import { motion as Motion } from 'motion/react'
 import { useFitText } from 'react-use-fittext'
 import FitBox from './FitBox'
+import BuildingBanner from './BuildingBanner'
 
 const reveal = {
   hidden: { opacity: 0, y: 32 },
@@ -133,6 +134,8 @@ export default function Hero({ copy }) {
           </FitBox>
         </div>
       </Motion.aside>
+
+      <BuildingBanner copy={copy.building} />
     </section>
   )
 }
