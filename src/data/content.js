@@ -360,6 +360,51 @@ const BG_CONTACT = [
   },
 ]
 
+/**
+ * Freelance capacity — the single source of truth for what the availability
+ * page claims.
+ *
+ * The scarcity on that page is legitimate only because it is true: capacity
+ * genuinely is limited and one slot genuinely is taken. When a slot actually
+ * fills, flip its `status` to 'taken' here and give it a real project — that
+ * is the only edit needed, in both locales. Nothing derives availability from
+ * anywhere else, so telling the truth stays the easy path.
+ *
+ * Do not add countdowns, viewer counts, recent-activity feeds, testimonials,
+ * or client logos to this data. If it isn't a fact about a real project, it
+ * does not belong here.
+ */
+const FREELANCE_SLOT_COUNT = 5
+
+function freelanceSlots(taken) {
+  const open = Array.from({ length: FREELANCE_SLOT_COUNT - taken.length }, (_, i) => ({
+    id: `open-${i + 1}`,
+    status: 'open',
+  }))
+  return [...taken, ...open]
+}
+
+const FREELANCE_SLOTS = {
+  en: freelanceSlots([
+    {
+      id: 'history-interactive',
+      status: 'taken',
+      title: 'History Interactive',
+      body: 'A platform for map generation and community interaction, built for the Rewriting History channel.',
+      tags: ['Elixir', 'Phoenix', 'SVG'],
+    },
+  ]),
+  bg: freelanceSlots([
+    {
+      id: 'history-interactive',
+      status: 'taken',
+      title: 'History Interactive',
+      body: 'Платформа за генериране на карти и общностно взаимодействие, изградена за канала Rewriting History.',
+      tags: ['Elixir', 'Phoenix', 'SVG'],
+    },
+  ]),
+}
+
 export const CONTENT = {
   en: {
     nav: {
@@ -369,6 +414,7 @@ export const CONTENT = {
         { to: '/', label: 'Home' },
         { href: '/#feature', label: 'Video / About' },
         { href: '/#projects', label: 'Projects' },
+        { to: '/freelance', label: 'Availability' },
         { href: '/#contact', label: 'Contact' },
       ],
     },
@@ -445,6 +491,17 @@ export const CONTENT = {
       deck: 'Arranged like a portfolio heatmap — the most substantial work gets the most space; nothing gets dropped.',
       items: EN_PROJECTS,
     },
+    freelance: {
+      eyebrow: 'Availability',
+      title: 'Five project slots.',
+      deck: 'I take on a limited number of client projects at a time so each one gets real attention. This page reflects what is actually free right now.',
+      openLabel: 'Open',
+      takenLabel: 'Taken',
+      openCta: 'Request this slot',
+      availabilitySummary: (open, total) =>
+        `${open} of ${total} slots open`,
+      slots: FREELANCE_SLOTS.en,
+    },
     contact: {
       eyebrow: 'Back page',
       title: 'Final-year student, open to roles where the work actually matters.',
@@ -476,6 +533,7 @@ export const CONTENT = {
         { to: '/', label: 'Начало' },
         { href: '/#feature', label: 'Видео / За мен' },
         { href: '/#projects', label: 'Проекти' },
+        { to: '/freelance', label: 'Наличност' },
         { href: '/#contact', label: 'Контакти' },
       ],
     },
@@ -542,6 +600,17 @@ export const CONTENT = {
       body: 'Не стигнах до софтуера само от една посока. Любопитството, работата в различни индустрии и времето прекарано в чужбина оформиха начина, по който подхождам към проблемите — и как изграждам решенията им.',
       timelineEyebrow: 'Времева линия',
       timeline: BG_TIMELINE,
+    },
+    freelance: {
+      eyebrow: 'Наличност',
+      title: 'Пет проектни места.',
+      deck: 'Работя с ограничен брой клиентски проекти едновременно, за да получи всеки истинско внимание. Тази страница отразява какво е свободно в момента.',
+      openLabel: 'Свободно',
+      takenLabel: 'Заето',
+      openCta: 'Заяви това място',
+      availabilitySummary: (open, total) =>
+        `${open} от ${total} свободни места`,
+      slots: FREELANCE_SLOTS.bg,
     },
     projects: {
       eyebrow: 'Работна статия',

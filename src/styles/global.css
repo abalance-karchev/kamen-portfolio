@@ -1206,6 +1206,53 @@ img { display: block; max-width: 100%; }
   font-weight: 700;
 }
 
+/* ── FREELANCE / AVAILABILITY ── */
+.freelance-summary {
+  margin-top: .6rem;
+  font-family: var(--font-tech);
+  font-size: clamp(0.68rem, 0.6rem + 0.35cqi, 0.8rem);
+  font-weight: 600;
+  color: var(--primary);
+}
+.freelance-slots {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+}
+.freelance-slot { display: flex; min-width: 0; }
+/* ProjectCard's body uses FitBox, which needs a definite height to fit into. */
+.freelance-card {
+  flex: 1 1 auto;
+  min-height: 220px;
+  position: relative;
+}
+.freelance-card--open {
+  border-style: dashed;
+  border-color: var(--line-strong);
+  background: color-mix(in srgb, var(--paper-2) 60%, transparent);
+}
+.freelance-open-link { display: flex; flex: 1 1 auto; min-width: 0; }
+.freelance-badge {
+  align-self: flex-start;
+  margin-top: .5rem;
+  padding: .2rem .55rem;
+  border-radius: 999px;
+  font-family: var(--font-tech);
+  font-size: clamp(0.5rem, 0.44rem + 0.3cqi, 0.6rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.freelance-badge--taken {
+  background: var(--accent);
+  color: var(--primary-soft);
+}
+.freelance-badge--open {
+  background: color-mix(in srgb, var(--primary) 88%, black);
+  color: #fff;
+}
+
 /* CONTACT */
 .contact-welcome {
   flex: 0 0 20%;
