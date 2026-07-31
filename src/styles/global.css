@@ -39,11 +39,15 @@
   --muted: #aba2af;
   --line: rgba(243,239,243,.11);
   --line-strong: rgba(243,239,243,.18);
-  --primary: #8b6cff;
-  --primary-2: #6f50ef;
-  --primary-soft: #baa8ff;
-  --accent: rgba(139,108,255,.14);
-  --glow: rgba(139,108,255,.22);
+  /* Accent runs purple → blue. --primary-2 is the blue end and is deliberately
+     a mid blue, not the light blue: it carries white button text, and a lighter
+     end drops below WCAG AA. The genuinely light blue lives in --primary-soft,
+     which is only ever used for decoration and large text. */
+  --primary: #7c62f5;
+  --primary-2: #2b74c4;
+  --primary-soft: #8fd0ff;
+  --accent: rgba(124,98,245,.14);
+  --glow: rgba(124,98,245,.22);
   --image-bg-a: #c000c0;
   --image-bg-mid: #7d26b3;
   --image-bg-b: #3c04a3;
@@ -54,6 +58,13 @@
 :lang(bg) {
   --font-display: 'Times New Roman', Georgia, serif;
   --font-prose: 'Times New Roman', Georgia, serif;
+}
+
+/* Accent gradient — resolved per theme, since custom properties substitute at
+   use time and each theme owns its own --primary / --primary-2 pair. */
+:root {
+  --accent-gradient: linear-gradient(120deg, var(--primary), var(--primary-2));
+  --accent-gradient-soft: linear-gradient(120deg, var(--primary), var(--primary-soft));
 }
 
 /* Shared image-surface gradient:
@@ -424,7 +435,7 @@ img { display: block; max-width: 100%; }
   padding: .7rem .8rem;
   border-radius: 14px;
   border: 1px solid transparent;
-  background: linear-gradient(160deg, color-mix(in srgb, var(--primary) 80%, white), var(--primary-2));
+  background: var(--accent-gradient);
   color: white;
   font-weight: 700;
   cursor: pointer;
@@ -458,9 +469,12 @@ img { display: block; max-width: 100%; }
 .caption strong { display: block; font-size: clamp(calc(0.72rem + 2px), calc(0.66rem + 0.9cqw), calc(0.9rem + 2.5px)); margin-bottom: .25rem; }
 .caption span { font-size: clamp(calc(0.656rem + 2px), calc(0.58rem + 0.95cqw), calc(0.82rem + 2.5px)); color: var(--muted); }
 .pull-quote {
-  padding: 1rem 1.1rem;
-  border-left: 3px solid var(--primary);
-  background: color-mix(in srgb, var(--paper-2) 84%, var(--accent));
+  padding: 1rem 1.1rem 1rem calc(1.1rem + 3px);
+  /* Gradient rule as a background layer rather than border-image — border-image
+     would suppress the 0 18px 18px 0 radius. */
+  background:
+    var(--accent-gradient-soft) left / 3px 100% no-repeat,
+    color-mix(in srgb, var(--paper-2) 84%, var(--accent));
   border-radius: 0 18px 18px 0;
   font-family: var(--font-display);
   font-size: clamp(0.85rem, 0.72rem + 2.05cqw + 0.35cqh, 0.93rem);
