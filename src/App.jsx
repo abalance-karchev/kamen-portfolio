@@ -4,6 +4,7 @@ import Nav from './components/Nav'
 import HomePage from './pages/HomePage'
 import NemotryPage from './pages/NemotryPage'
 import FreelancePage from './pages/FreelancePage'
+import RequestPage from './pages/RequestPage'
 import DocumentRoute from './pages/DocumentRoute'
 import { CONTENT } from './data/content'
 
@@ -47,6 +48,7 @@ export default function App() {
         <Route path="/" element={<HomePage copy={copy} />} />
         <Route path="/nemotry" element={<NemotryPage copy={copy} />} />
         <Route path="/freelance" element={<FreelancePage copy={copy} />} />
+        <Route path="/request" element={<RequestPage copy={copy} />} />
         <Route path="/documents/:slug" element={<DocumentRoute />} />
       </Routes>
     </BrowserRouter>
