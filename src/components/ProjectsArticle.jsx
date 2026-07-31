@@ -3,6 +3,7 @@ import { motion as Motion } from 'motion/react'
 import { getProjectCards } from '../utils/v3'
 import { measureProjectFitPretext } from '../utils/measureProjectFitPretext'
 import FitBox from './FitBox'
+import ProjectCard from './ProjectCard'
 
 /** @param {{ id: string, startx: number, starty: number, width: number, height: number }[]} cards */
 function cardsToRects(cards) {
@@ -123,41 +124,16 @@ export default function ProjectsArticle({ copy }) {
                   boxSizing: 'border-box',
                 }}
               >
-                <Motion.article
+                <ProjectCard
                   className={[
-                    'projects-item',
                     isLandscape ? 'projects-item--landscape' : '',
                     isLast      ? 'projects-item--last'      : '',
                   ].filter(Boolean).join(' ')}
-                  whileHover={{ y: -3, boxShadow: 'var(--shadow-lg)' }}
-                  transition={{ duration: .2 }}
-                >
-                  {p.image && (
-                    <div className="project-visual">
-                      <img src={p.image} alt={p.title} />
-                    </div>
-                  )}
-
-                  <div className="project-content">
-                    <h4 className="project-title">{p.title}</h4>
-
-                    <FitBox
-                      element="p"
-                      maxFontSize={21}
-                      containerStyle={{ flex: '1 1 0', minHeight: 0, overflow: 'hidden' }}
-                      textStyle={{ lineHeight: 1.6, color: 'var(--muted)', margin: 0 }}
-                      className="project-body"
-                    >
-                      {p.body}
-                    </FitBox>
-
-                    {p.tags?.length > 0 && (
-                      <div className="tags">
-                        {p.tags.map(t => <span className="tag" key={t}>{t}</span>)}
-                      </div>
-                    )}
-                  </div>
-                </Motion.article>
+                  image={p.image}
+                  title={p.title}
+                  body={p.body}
+                  tags={p.tags}
+                />
               </div>
             )
             })
