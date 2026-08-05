@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Kamen Karchev — CV (golden demo)</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+<style>
+  :root{
+    --pillar: 38.1966%;      /* the golden column boundary — everything left-aligns here */
+    --row1: 30.9017%;        /* photo / stack split, top golden */
+    --seam: 50%;             /* boundary between the two golden rectangles */
+    --row3: 61.8034%;        /* highlights internal rhythm */
+    --row4: 80.9017%;
+
+    --coal-950:#141419;
+    --coal-900:#1c1d23;
+    --coal-800:#26272f;
+    --coal-700:#34363f;
+    --sky-100:#eef3f6;
+    --sky-200:#d7e3ea;
+    --sky-300:#aec4d0;
+    --wine-700:#5c1c26;
+    --wine-600:#7a2432;
+    --wine-500:#9c2f3f;
+    --wine-400:#c14456;
+    --wine-glow:#e0637a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    display:flex;
+    justify-content:center;
+    background:#0c0c0f;
+    padding:24px 0;
+  }
+
+  /* ── A4 PAGE ── */
+  .page{
+    position:relative;
+    width:210mm;
+    height:297mm;
+    overflow:hidden;
+    background:
+      radial-gradient(ellipse 60% 45% at 14% 12%, #34212a 0%, transparent 60%),
+      radial-gradient(ellipse 70% 55% at 85% 96%, #2a2130 0%, transparent 55%),
+      linear-gradient(165deg, var(--coal-900) 0%, var(--coal-950) 55%, var(--coal-900) 100%);
+    box-shadow:0 30px 80px rgba(0,0,0,.55);
+    font-family:'Inter',sans-serif;
+    color:var(--sky-100);
+  }
+
+  /* grain: a fixed noise layer, screened over everything for a sanded, tactile feel */
+  .grain{
+    position:absolute; inset:0;
+    z-index:50;
+    pointer-events:none;
+    opacity:.05;
+    mix-blend-mode:overlay;
+  }
+
+  /* ═══ shared type ═══ */
+  .eyebrow{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--wine-glow);
+  }
+  .eyebrow::after{
+    content:'';
+    flex:1;
+    height:1px;
+    max-width:120px;
+    background:linear-gradient(90deg, var(--wine-glow), transparent);
+    border-radius:2px;
+  }
+  .name{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:40px;
+    line-height:1.02;
+    letter-spacing:.5px;
+    background:linear-gradient(100deg, var(--sky-100) 30%, var(--sky-300) 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .role{
+    margin-top:8px;
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-weight:300;
+    font-size:16px;
+    color:var(--wine-glow);
+  }
+  .about{
+    margin-top:16px;
+    max-width:118mm;
+    font-size:11px;
+    line-height:1.75;
+    font-weight:300;
+    color:var(--sky-200);
+  }
+  .about strong{ color:var(--sky-100); font-weight:600; }
+
+  /* ═══ TOP GOLDEN: portrait header ═══ */
+  .header{ position:absolute; left:0; top:0; width:100%; height:var(--seam); }
+
+  .photo-wrap{
+    position:absolute;
+    left:6%;
+    top:4%;
+    width:26%;
+    height:calc(var(--row1) - 6%);
+    border-radius:38% 42% 40% 44% / 46% 40% 44% 40%;
+    overflow:hidden;
+    background:
+      radial-gradient(ellipse at 30% 20%, var(--wine-500), transparent 65%),
+      radial-gradient(ellipse at 80% 90%, var(--coal-700), transparent 60%),
+      var(--coal-800);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.06),
+      0 18px 40px rgba(0,0,0,.45),
+      inset 0 0 30px rgba(0,0,0,.4);
+  }
+  .photo-wrap img{
+    position:absolute;
+    left:50%;
+    top:6%;
+    width:150%;
+    max-width:none;
+    transform:translateX(-50%);
+  }
+  .photo-glow{
+    position:absolute;
+    left:-15%;
+    top:-15%;
+    width:130%;
+    height:130%;
+    background:radial-gradient(circle at 30% 25%, rgba(193,68,86,.35), transparent 60%);
+    filter:blur(18px);
+    z-index:-1;
+  }
+
+  .stack{
+    position:absolute;
+    left:6%;
+    top:var(--row1);
+    width:26%;
+    height:calc(var(--seam) - var(--row1) - 4%);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:9px;
+  }
+  .stack-title{
+    font-size:9.5px;
+    font-weight:700;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--sky-300);
+    margin-bottom:2px;
+  }
+  .skill-row{ display:flex; flex-direction:column; gap:3px; }
+  .skill-label{ font-size:9.5px; font-weight:600; color:var(--sky-200); }
+  .skill-track{
+    height:5px;
+    border-radius:5px;
+    background:rgba(255,255,255,.07);
+    overflow:hidden;
+  }
+  .skill-fill{
+    height:100%;
+    border-radius:5px;
+    background:linear-gradient(90deg, var(--wine-600), var(--wine-glow));
+  }
+
+  .header-text{
+    position:absolute;
+    left:var(--pillar);
+    top:6%;
+    right:6%;
+  }
+
+  /* ═══ CTA banner — straddles the seam, breaks the two goldens ═══ */
+  .cta{
+    position:absolute;
+    left:0;
+    top:calc(var(--seam) - 4.4%);
+    width:100%;
+    height:8.8%;
+    z-index:5;
+    display:flex;
+    align-items:center;
+    background:linear-gradient(100deg, var(--wine-700) 0%, var(--wine-500) 55%, var(--wine-600) 100%);
+    box-shadow:0 10px 30px rgba(0,0,0,.4);
+  }
+  .cta::before, .cta::after{
+    content:'';
+    position:absolute;
+    left:0; width:100%; height:14px;
+  }
+  .cta::before{ top:-13px; background:radial-gradient(ellipse 60px 14px at 50% 100%, var(--wine-600) 60%, transparent 62%) repeat-x; background-size:90px 14px; }
+  .cta::after{ bottom:-13px; background:radial-gradient(ellipse 60px 14px at 50% 0%, var(--wine-600) 60%, transparent 62%) repeat-x; background-size:90px 14px; }
+  .cta-inner{
+    position:relative;
+    left:var(--pillar);
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .cta-label{
+    font-size:9.5px;
+    font-weight:700;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--wine-glow);
+    background:rgba(0,0,0,.25);
+    padding:3px 0;
+  }
+  .cta-main{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:15px;
+    color:var(--sky-100);
+  }
+  .cta-main a{ color:inherit; text-decoration:none; border-bottom:1px solid rgba(255,255,255,.4); }
+
+  /* ═══ BOTTOM GOLDEN: highlights ═══ */
+  .highlights{
+    position:absolute;
+    left:0;
+    top:calc(var(--seam) + 4.4%);
+    width:100%;
+    height:calc(50% - 4.4%);
+    padding:0 6% 4% var(--pillar);
+  }
+  .h-title{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:22px;
+    color:var(--sky-100);
+    margin-bottom:2px;
+  }
+  .h-sub{
+    font-size:10px;
+    font-weight:300;
+    font-style:italic;
+    color:var(--sky-300);
+    margin-bottom:16px;
+  }
+
+  .block{ margin-bottom:22px; }
+  .block-title{
+    font-size:9.5px;
+    font-weight:700;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--wine-glow);
+    margin-bottom:8px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .block-title::after{ content:''; flex:1; height:1px; background:linear-gradient(90deg, rgba(224,99,122,.4), transparent); }
+
+  .entry{ margin-bottom:11px; }
+  .entry-head{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; }
+  .entry-title{ font-size:11.5px; font-weight:600; color:var(--sky-100); }
+  .entry-year{ font-size:9px; font-weight:600; color:var(--sky-300); white-space:nowrap; }
+  .entry-org{ font-size:9.5px; color:var(--sky-300); margin-top:1px; }
+  .entry-desc{ font-size:9.5px; line-height:1.55; color:var(--sky-200); margin-top:3px; font-weight:300; max-width:132mm; }
+
+  .certs{ list-style:none; display:flex; flex-direction:column; gap:4px; }
+  .certs li{ font-size:9.5px; color:var(--sky-200); font-weight:300; position:relative; padding-left:14px; }
+  .certs li::before{ content:''; position:absolute; left:0; top:6px; width:6px; height:6px; border-radius:50%; background:var(--wine-glow); }
+
+  .contacts{ display:flex; flex-wrap:wrap; gap:10px 22px; margin-top:2px; }
+  .contact-item{ display:flex; align-items:center; gap:7px; font-size:9.5px; color:var(--sky-200); }
+  .contact-item i{ color:var(--wine-glow); width:12px; text-align:center; }
+
+  .signoff{
+    margin-top:26px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-weight:300;
+    font-size:12px;
+    color:var(--sky-300);
+  }
+  .signoff-mark{ color:var(--wine-glow); font-size:11px; }
+
+  .pillar-mark{
+    position:absolute;
+    left:var(--pillar);
+    top:0;
+    bottom:0;
+    width:1px;
+    background:linear-gradient(to bottom, transparent, rgba(224,99,122,.18) 8%, rgba(224,99,122,.18) 92%, transparent);
+    z-index:1;
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <svg class="grain" xmlns="http://www.w3.org/2000/svg">
+    <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+    <rect width="100%" height="100%" filter="url(#noise)"/>
+  </svg>
+
+  <div class="pillar-mark"></div>
+
+  <!-- ═══ TOP GOLDEN — portrait header ═══ -->
+  <div class="header">
+    <div class="photo-wrap">
+      <div class="photo-glow"></div>
+      <img src="public/images/portrait-kamen-karchev-glow.png" alt="Kamen Karchev"/>
+    </div>
+
+    <div class="stack">
+      <div class="stack-title">Stack</div>
+      <div class="skill-row"><span class="skill-label">Java · Spring · Hibernate</span><div class="skill-track"><div class="skill-fill" style="width:90%;"></div></div></div>
+      <div class="skill-row"><span class="skill-label">C# · .NET</span><div class="skill-track"><div class="skill-fill" style="width:90%;"></div></div></div>
+      <div class="skill-row"><span class="skill-label">Elixir · Phoenix</span><div class="skill-track"><div class="skill-fill" style="width:80%;"></div></div></div>
+      <div class="skill-row"><span class="skill-label">React · TypeScript</span><div class="skill-track"><div class="skill-fill" style="width:70%;"></div></div></div>
+    </div>
+
+    <div class="header-text">
+      <div class="eyebrow">Portfolio · CV</div>
+      <div class="name">Kamen<br/>Karchev</div>
+      <div class="role">Full-Stack Software Engineer</div>
+      <p class="about">
+        Curious and <strong>self-motivated</strong> to experiment and innovate — I turn ideas into working
+        software with a few lines of code and one or two cups of coffee. My skills don't vanish when I
+        close the IDE: from building a <strong>YouTube channel</strong> to the event &amp; wedding industry
+        and sales, I've picked up a wide, adaptable skillset along the way. Still plenty left to learn,
+        and I'm excited to keep building on it.
+      </p>
+    </div>
+  </div>
+
+  <!-- ═══ CTA — the break between the two pages ═══ -->
+  <div class="cta">
+    <div class="cta-inner">
+      <span class="cta-label">See more</span>
+      <span class="cta-main">Full portfolio &amp; projects at <a href="https://kamenkarchev.com">kamenkarchev.com</a></span>
+    </div>
+  </div>
+
+  <!-- ═══ BOTTOM GOLDEN — highlights ═══ -->
+  <div class="highlights">
+    <div class="h-title">Highlights</div>
+    <div class="h-sub">Education, projects &amp; how to reach me</div>
+
+    <div class="block">
+      <div class="block-title">Education</div>
+      <div class="entry">
+        <div class="entry-head">
+          <span class="entry-title">B.Sc. Software &amp; Internet Technologies</span>
+          <span class="entry-year">2022 – 2026</span>
+        </div>
+        <div class="entry-org">Technical University of Varna</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">Projects</div>
+      <div class="entry">
+        <div class="entry-head">
+          <span class="entry-title">History Interactive — PCC Map</span>
+          <span class="entry-year">2026</span>
+        </div>
+        <div class="entry-desc">Elixir/Phoenix + PostgreSQL platform for map generation &amp; community interaction, SVG territory rendering with client-side boolean geometry.</div>
+      </div>
+      <div class="entry">
+        <div class="entry-head">
+          <span class="entry-title">DopeyUserAPI</span>
+          <span class="entry-year">2025 – 2026</span>
+        </div>
+        <div class="entry-desc">Scalable user-management service — registration, verification, password reset &amp; social auth on Elixir, Phoenix, PostgreSQL, Docker, Oban, Grafana.</div>
+      </div>
+      <div class="entry">
+        <div class="entry-head">
+          <span class="entry-title">Winery Operations Platform</span>
+          <span class="entry-year">2024 – 2025</span>
+        </div>
+        <div class="entry-desc">Multi-role Java team project — orders, inventory, task management &amp; notifications.</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">Certificates</div>
+      <ul class="certs">
+        <li>Student Science Session — Cybersecurity Team Management</li>
+        <li>Professional Qualification Certificate</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <div class="block-title">Contact</div>
+      <div class="contacts">
+        <span class="contact-item"><i class="fa fa-envelope"></i>kamen.karchev03@gmail.com</span>
+        <span class="contact-item"><i class="fa fa-map-marker-alt"></i>Varna, Bulgaria</span>
+        <span class="contact-item"><i class="fab fa-linkedin"></i>kamen-karchev</span>
+        <span class="contact-item"><i class="fab fa-github"></i>KamenKarchev</span>
+      </div>
+    </div>
+
+    <div class="signoff">
+      <span class="signoff-mark">✦</span>
+      Building things, one commit at a time.
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

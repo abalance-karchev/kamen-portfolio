@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Kamen Karchev — CV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+<style>
+/* ═══════════════════════════════════════════════════════════════════
+   GOLDEN CV — 188.8949mm × 297mm  (√φ : 2, height-matched to A4)
+   Grid is an alignment guide only — never drawn.
+   Pillar (the one vertical line): x = 72.143mm
+   Horizontal seams: 91.778 · 148.5 · 183.556 · 240.278mm
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root{
+  /* ── geometry ── */
+  --page-w: 188.8949mm;
+  --page-h: 297mm;
+  --pillar: 72.143mm;
+  --seam-1: 91.778mm;
+  --seam-2: 148.5mm;
+  --seam-3: 183.556mm;
+  --seam-4: 240.278mm;
+  --band-h: 35.055mm;
+
+  /* ── primary: coal ── */
+  --coal-950:#0e1016;
+  --coal-900:#14171f;
+  --coal-850:#191d27;
+  --coal-800:#20242f;
+  --coal-700:#2b303d;
+  --coal-600:#3a4152;
+  --coal-500:#4e5668;
+
+  /* ── secondary: light blue ── */
+  --blue-25: #f7fafd;
+  --blue-50: #eef4fa;
+  --blue-100:#e0eaf4;
+  --blue-200:#cbdcec;
+  --blue-300:#adc7de;
+  --blue-400:#8aabc9;
+  --blue-500:#6489ac;
+  --blue-600:#48678a;
+
+  /* ── accent: wine (sparingly) ── */
+  --wine-700:#5b1c2a;
+  --wine-600:#762436;
+  --wine-500:#932f44;
+  --wine-400:#b04357;
+  --wine-300:#c9697a;
+
+  --r-lg: 11mm;   /* squircle radii */
+  --r-md: 7mm;
+  --r-sm: 4mm;
+  --r-xs: 2.4mm;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+
+body{
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:26px 0;
+  background:#0a0b0f;
+  font-family:'Plus Jakarta Sans', system-ui, sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+
+.page{
+  position:relative;
+  width:var(--page-w);
+  height:var(--page-h);
+  overflow:hidden;
+  background:var(--blue-50);
+  box-shadow:0 40px 90px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.05);
+  isolation:isolate;
+}
+
+/* ══════════════════════════════════════════════════
+   LAYER 0 — BACKGROUND FIELDS
+   Three logical groups in the top half, two below.
+   ══════════════════════════════════════════════════ */
+
+/* ── group A: portrait field (1.2.1) ──
+   light, so the dark suit reads; gradient + spray-can grain */
+.field-portrait{
+  position:absolute;
+  left:0; top:0;
+  width:var(--pillar);
+  height:calc(var(--seam-1) + 6mm);
+  overflow:hidden;          /* clips the portrait to its own field */
+  background:
+    radial-gradient(ellipse 62% 48% at 62% 22%, #ffffff 0%, rgba(255,255,255,0) 62%),
+    radial-gradient(ellipse 80% 60% at 18% 8%,  var(--blue-100) 0%, rgba(224,234,244,0) 70%),
+    linear-gradient(158deg, var(--blue-200) 0%, var(--blue-100) 40%, var(--blue-50) 100%);
+  z-index:1;
+}
+/* spray-can speckle */
+.field-portrait::after{
+  content:'';
+  position:absolute; inset:0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(72,103,138,.14) .35mm, transparent .36mm) 0 0/2.1mm 2.1mm,
+    radial-gradient(circle at 70% 65%, rgba(72,103,138,.10) .28mm, transparent .29mm) .7mm .9mm/1.6mm 1.6mm,
+    radial-gradient(circle at 45% 15%, rgba(147,47,68,.07) .3mm, transparent .31mm) .3mm .4mm/3.1mm 3.1mm;
+  -webkit-mask-image:radial-gradient(ellipse 78% 70% at 30% 82%, #000 0%, transparent 72%);
+          mask-image:radial-gradient(ellipse 78% 70% at 30% 82%, #000 0%, transparent 72%);
+  opacity:.85;
+}
+
+/* ── group C: paper field (1.1.1 bottom + 1.1.2) ──
+   about-me + experience share one card; overhangs the pillar,
+   tucks under the name bar */
+.field-paper{
+  position:absolute;
+  left:var(--pillar);      /* flush against the spine — no overhang past it */
+  top:30.8mm;               /* sits right under the name bar */
+  right:-4mm;
+  height:calc(var(--seam-2) - 30.8mm - 2.6mm);
+  border-radius:var(--r-lg) 0 0 var(--r-lg);
+  background:
+    radial-gradient(ellipse 70% 50% at 12% 4%, #ffffff 0%, rgba(255,255,255,0) 60%),
+    linear-gradient(168deg, var(--blue-25) 0%, #ffffff 34%, var(--blue-50) 100%);
+  box-shadow:
+    0 1.4mm 5mm rgba(20,23,31,.13),
+    0 .3mm 1.2mm rgba(20,23,31,.08),
+    inset 0 .35mm 0 rgba(255,255,255,.9);
+  z-index:2;
+}
+
+/* ── group B: the dark spine ──
+   stack (1.2.2) → education (2.1.2b) → contacts (2.2.2)
+   one continuous coal column, interrupted by the banner.
+   Slight horizontal striping leads the eye downward. */
+.spine{
+  position:absolute;
+  left:0;
+  width:var(--pillar);
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255,255,255,.030) 0mm,
+      rgba(255,255,255,.030) .18mm,
+      rgba(255,255,255,0)    .18mm,
+      rgba(255,255,255,0)    2.6mm
+    ),
+    radial-gradient(ellipse 90% 40% at 50% 0%, rgba(147,47,68,.20) 0%, rgba(147,47,68,0) 70%),
+    linear-gradient(178deg, var(--coal-700) 0%, var(--coal-850) 45%, var(--coal-950) 100%);
+  z-index:3;
+}
+.spine-top{                       /* stack — overhangs upward into the portrait field */
+  top:calc(var(--seam-1) - 5.4mm);
+  height:calc(var(--seam-2) - var(--seam-1) + 5.4mm);
+  border-radius:var(--r-lg) var(--r-lg) 0 0;
+  box-shadow:0 -1.2mm 5mm rgba(14,16,22,.28);
+}
+.spine-bottom{                    /* education + contacts — runs to the page edge */
+  top:var(--seam-3);
+  height:calc(var(--page-h) - var(--seam-3));
+}
+.spine-bottom::after{             /* soft inner edge where it meets the light panel */
+  content:'';
+  position:absolute;
+  right:0; top:0; bottom:0; width:8mm;
+  background:linear-gradient(90deg, rgba(14,16,22,0), rgba(14,16,22,.5));
+}
+
+/* ── group E: light panel — projects (2.1.1b) + certificates (2.2.1) ── */
+.field-panel{
+  position:absolute;
+  left:var(--pillar);
+  top:var(--seam-3);
+  right:0;
+  height:calc(var(--page-h) - var(--seam-3));
+  background:
+    radial-gradient(ellipse 60% 40% at 88% 6%, rgba(255,255,255,.85) 0%, rgba(255,255,255,0) 60%),
+    radial-gradient(ellipse 70% 45% at 6% 96%, rgba(147,47,68,.10) 0%, rgba(147,47,68,0) 62%),
+    linear-gradient(172deg, var(--blue-100) 0%, var(--blue-50) 38%, var(--blue-200) 100%);
+  z-index:3;
+}
+
+/* ══════════════════════════════════════════════════
+   LAYER 1 — CONTENT
+   ══════════════════════════════════════════════════ */
+
+/* ── PORTRAIT — sits inside its field, so the spine panel below
+      overlaps it and the figure reads as standing behind the stack ── */
+.portrait{
+  position:absolute;
+  left:49%;
+  bottom:-1.5%;
+  height:107%;
+  transform:translateX(-50%);
+  filter:drop-shadow(0 1.6mm 3.4mm rgba(20,35,55,.24));
+  pointer-events:none;
+}
+
+/* ── NAME BAR (1.1.1 top) ──
+   solid, smooth, bulging — sits above everything, breaks into the
+   portrait field on the left and off the page edge on the right */
+.namebar{
+  position:absolute;
+  left:calc(var(--pillar) - 8.6mm);
+  top:5.6mm;
+  right:-5mm;
+  height:24.4mm;
+  z-index:10;
+  display:flex;
+  align-items:center;
+  border-radius:var(--r-md) 0 0 var(--r-md);
+  background:
+    linear-gradient(180deg, var(--coal-600) 0%, var(--coal-800) 42%, var(--coal-900) 100%);
+  box-shadow:
+    0 3.4mm 8mm rgba(10,12,18,.42),
+    0 1mm 2.6mm rgba(10,12,18,.28),
+    inset 0 .5mm 0 rgba(255,255,255,.16),
+    inset 0 -.4mm 0 rgba(0,0,0,.4);
+}
+/* the bulge: a broad specular band across the top third */
+.namebar::before{
+  content:'';
+  position:absolute;
+  left:0; right:0; top:0;
+  height:52%;
+  border-radius:var(--r-md) 0 0 0;
+  background:linear-gradient(180deg, rgba(255,255,255,.13) 0%, rgba(255,255,255,.02) 70%, transparent 100%);
+  pointer-events:none;
+}
+/* wine hairline — the accent, used once */
+.namebar::after{
+  content:'';
+  position:absolute;
+  left:0; right:0; bottom:0;
+  height:.9mm;
+  background:linear-gradient(90deg, var(--wine-700) 0%, var(--wine-400) 46%, var(--wine-300) 62%, var(--wine-600) 100%);
+  box-shadow:0 0 3mm rgba(176,67,87,.5);
+}
+.namebar-name{
+  padding-left:8.6mm;
+  width:calc(44.596mm + 8.6mm);
+  flex:0 0 auto;
+}
+.namebar-name .n{
+  font-family:'Fraunces', serif;
+  font-weight:600;
+  font-size:6.6mm;
+  line-height:1.02;
+  letter-spacing:.02em;
+  color:var(--blue-50);
+}
+.namebar-role{
+  flex:1;
+  padding-left:5.4mm;
+  border-left:.3mm solid rgba(255,255,255,.10);
+}
+.namebar-role .r{
+  font-size:3.5mm;
+  font-weight:600;
+  line-height:1.25;
+  letter-spacing:.055em;
+  text-transform:uppercase;
+  color:var(--blue-300);
+}
+.namebar-role .r em{
+  display:block;
+  font-style:normal;
+  font-size:2.5mm;
+  font-weight:500;
+  letter-spacing:.16em;
+  color:var(--wine-300);
+  margin-top:1.1mm;
+}
+
+/* ── glass bubble: the shared treatment for headers + content
+      on the paper field and the light panel ── */
+.bubble{
+  position:relative;
+  border-radius:var(--r-md);
+  background:linear-gradient(158deg, rgba(255,255,255,.72) 0%, rgba(255,255,255,.34) 100%);
+  -webkit-backdrop-filter:blur(2.2mm) saturate(1.3);
+          backdrop-filter:blur(2.2mm) saturate(1.3);
+  box-shadow:
+    inset 0 .3mm 0 rgba(255,255,255,.95),
+    inset 0 -.25mm 0 rgba(72,103,138,.10),
+    0 .8mm 2.6mm rgba(30,50,75,.09);
+}
+
+/* section label — a small floating pill that rides on top of its bubble */
+.tag{
+  position:absolute;
+  top:-2.6mm;
+  left:5mm;
+  display:inline-flex;
+  align-items:center;
+  gap:1.6mm;
+  height:5.4mm;
+  padding:0 3.4mm;
+  border-radius:2.7mm;
+  font-size:2.45mm;
+  font-weight:800;
+  letter-spacing:.19em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  color:var(--blue-50);
+  background:linear-gradient(172deg, var(--coal-600), var(--coal-850));
+  box-shadow:
+    0 .9mm 2.4mm rgba(14,17,25,.32),
+    inset 0 .3mm 0 rgba(255,255,255,.2);
+  z-index:2;
+}
+.tag i{ font-size:2.3mm; color:var(--wine-300); }
+
+/* ── ABOUT ME (1.1.1 bottom) ──
+   header at the pillar; prose runs the full width, ignoring the
+   inner sub-divider above it */
+.about{
+  position:absolute;
+  left:calc(var(--pillar) + 3.4mm);
+  top:36mm;
+  right:3.4mm;
+  height:49.8mm;
+  z-index:5;
+  padding:6.4mm 6mm 4.6mm 6mm;
+}
+.about p{
+  font-size:2.92mm;
+  line-height:1.68;
+  font-weight:400;
+  color:var(--coal-700);
+  letter-spacing:.002em;
+}
+.about strong{ font-weight:700; color:var(--coal-900); }
+.about .accent{ color:var(--wine-600); font-weight:700; }
+
+/* ── EXPERIENCE (1.1.2) ── */
+.experience{
+  position:absolute;
+  left:calc(var(--pillar) + 3.4mm);
+  top:89.4mm;              /* crosses the 91.778 seam — content breaks the grid */
+  right:3.4mm;
+  height:55.6mm;
+  z-index:5;
+  padding:5.8mm 5.4mm 2.2mm 5.4mm;
+}
+.xp-row{
+  display:flex;
+  gap:2.8mm;
+  align-items:baseline;
+  margin-bottom:2.3mm;
+}
+.xp-row:last-child{ margin-bottom:0; }
+.xp-when{
+  flex:0 0 18.5mm;
+  font-size:2.22mm;
+  font-weight:700;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color:var(--blue-600);
+  padding-top:.4mm;
+}
+.xp-body{ flex:1; min-width:0; }
+.xp-title{
+  font-size:2.92mm;
+  font-weight:700;
+  color:var(--coal-900);
+  line-height:1.22;
+}
+.xp-org{
+  font-size:2.42mm;
+  font-weight:600;
+  color:var(--wine-600);
+  margin-top:.35mm;
+}
+.xp-desc{
+  font-size:2.5mm;
+  line-height:1.42;
+  font-weight:400;
+  color:var(--coal-600);
+  margin-top:.7mm;
+}
+
+/* ── STACK (1.2.2) — on the dark spine, centred, two columns ── */
+.stack{
+  position:absolute;
+  left:0;
+  top:calc(var(--seam-1) - 2.6mm);
+  width:var(--pillar);
+  height:calc(var(--seam-2) - var(--seam-1) + 2.6mm);
+  z-index:6;
+  padding:6.4mm 6mm 5mm;
+  text-align:center;
+}
+.stack-head{
+  font-size:2.7mm;
+  font-weight:800;
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  color:var(--blue-200);
+  margin-bottom:.9mm;
+}
+.stack-head::after{
+  content:'';
+  display:block;
+  width:9mm;
+  height:.4mm;
+  margin:1.5mm auto 0;
+  border-radius:.2mm;
+  background:linear-gradient(90deg, transparent, var(--wine-400), transparent);
+}
+.stack-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.5mm 2.6mm;
+  margin-top:3.4mm;
+}
+.chip{
+  padding:1.5mm .8mm;
+  border-radius:var(--r-xs);
+  font-size:2.42mm;
+  font-weight:600;
+  letter-spacing:.012em;
+  color:var(--blue-200);
+  background:linear-gradient(168deg, rgba(255,255,255,.075), rgba(255,255,255,.022));
+  box-shadow:
+    inset 0 .22mm 0 rgba(255,255,255,.14),
+    0 .4mm 1mm rgba(0,0,0,.22);
+}
+.chip.lead{
+  color:#fff;
+  background:linear-gradient(168deg, rgba(176,67,87,.34), rgba(118,36,54,.20));
+  box-shadow:
+    inset 0 .22mm 0 rgba(255,255,255,.22),
+    0 .4mm 1.2mm rgba(0,0,0,.28);
+}
+
+/* ══════════════════════════════════════════════════
+   THE BANNER (2.1) — full-bleed, shiny, horizontal texture.
+   Breaks both goldens; carries HIGHLIGHTS + the call to action.
+   ══════════════════════════════════════════════════ */
+.banner{
+  position:absolute;
+  left:0;
+  top:var(--seam-2);
+  width:100%;
+  height:var(--band-h);
+  z-index:12;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  background:
+    linear-gradient(100deg,
+      var(--coal-900)  0%,
+      var(--coal-800) 18%,
+      var(--wine-700) 52%,
+      var(--wine-500) 76%,
+      var(--wine-600) 100%);
+  box-shadow:
+    0 2.6mm 7mm rgba(10,12,18,.42),
+    0 -1.6mm 5mm rgba(10,12,18,.30),
+    inset 0 .4mm 0 rgba(255,255,255,.20),
+    inset 0 -.4mm 0 rgba(0,0,0,.34);
+}
+/* horizontal brushed-metal striping */
+.banner::before{
+  content:'';
+  position:absolute; inset:0;
+  background:repeating-linear-gradient(
+    180deg,
+    rgba(255,255,255,.055) 0mm,
+    rgba(255,255,255,.055) .16mm,
+    rgba(255,255,255,0)    .16mm,
+    rgba(255,255,255,0)    .74mm
+  );
+  pointer-events:none;
+}
+/* the shine: a wide raking highlight */
+.banner::after{
+  content:'';
+  position:absolute;
+  left:-10%; right:-10%; top:0; bottom:0;
+  background:linear-gradient(
+    97deg,
+    rgba(255,255,255,0)   0%,
+    rgba(255,255,255,.05) 26%,
+    rgba(255,255,255,.20) 41%,
+    rgba(255,255,255,.05) 55%,
+    rgba(255,255,255,0)   72%);
+  -webkit-mask-image:linear-gradient(180deg, rgba(0,0,0,.35), #000 42%, rgba(0,0,0,.25));
+          mask-image:linear-gradient(180deg, rgba(0,0,0,.35), #000 42%, rgba(0,0,0,.25));
+  pointer-events:none;
+}
+
+/* HIGHLIGHTS — a tab straddling the banner's top edge, anchored to the pillar */
+.highlights-tab{
+  position:absolute;
+  left:var(--pillar);
+  top:calc(var(--seam-2) - 3.3mm);
+  z-index:14;
+  display:inline-flex;
+  align-items:center;
+  gap:2.2mm;
+  height:6.6mm;
+  padding:0 5.4mm;
+  border-radius:3.3mm;
+  font-size:2.75mm;
+  font-weight:800;
+  letter-spacing:.26em;
+  text-transform:uppercase;
+  color:var(--coal-950);
+  background:linear-gradient(172deg, #ffffff 0%, var(--blue-200) 100%);
+  box-shadow:
+    0 1.4mm 3.4mm rgba(10,12,18,.38),
+    inset 0 .35mm 0 rgba(255,255,255,1),
+    inset 0 -.3mm 0 rgba(72,103,138,.3);
+}
+.highlights-tab i{ font-size:2.5mm; color:var(--wine-600); }
+
+/* the call to action, spread across the full width */
+.cta{
+  position:relative;
+  z-index:2;
+  display:flex;
+  align-items:baseline;
+  justify-content:center;
+  gap:5.4mm;
+  width:100%;
+  padding:4.2mm 9mm 0;
+}
+.cta-side{
+  font-size:2.6mm;
+  font-weight:800;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.62);
+  white-space:nowrap;
+}
+.cta-url{
+  font-family:'Fraunces', serif;
+  font-weight:600;
+  font-size:5.4mm;
+  letter-spacing:.012em;
+  color:#fff;
+  text-decoration:none;
+  text-shadow:0 .5mm 1.6mm rgba(0,0,0,.35);
+  white-space:nowrap;
+}
+.cta-url span{ color:var(--blue-200); }
+
+/* ── EDUCATION (2.1.2 bottom) — dark spine, centred ── */
+.education{
+  position:absolute;
+  left:0;
+  top:var(--seam-3);
+  width:var(--pillar);
+  height:calc(var(--seam-4) - var(--seam-3));
+  z-index:6;
+  padding:6.6mm 5.4mm 4mm;
+  text-align:center;
+}
+.dark-head{
+  font-size:2.7mm;
+  font-weight:800;
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  color:var(--blue-200);
+}
+.dark-head::after{
+  content:'';
+  display:block;
+  width:9mm;
+  height:.4mm;
+  margin:1.5mm auto 0;
+  border-radius:.2mm;
+  background:linear-gradient(90deg, transparent, var(--wine-400), transparent);
+}
+.edu-item{ margin-top:3.6mm; }
+.edu-deg{
+  font-size:2.85mm;
+  font-weight:700;
+  line-height:1.28;
+  color:#fff;
+}
+.edu-school{
+  font-size:2.45mm;
+  font-weight:500;
+  line-height:1.35;
+  color:var(--blue-400);
+  margin-top:.7mm;
+}
+.edu-when{
+  display:inline-block;
+  margin-top:1.1mm;
+  padding:.5mm 2.2mm;
+  border-radius:1.6mm;
+  font-size:2.2mm;
+  font-weight:700;
+  letter-spacing:.08em;
+  color:var(--wine-300);
+  background:rgba(176,67,87,.16);
+  box-shadow:inset 0 0 0 .18mm rgba(176,67,87,.3);
+}
+
+/* ── PROJECTS (2.1.1 bottom) — light panel, pillar-aligned ── */
+.projects{
+  position:absolute;
+  left:calc(var(--pillar) + 3.4mm);
+  top:calc(var(--seam-3) + 4.6mm);
+  right:3.4mm;
+  height:calc(var(--seam-4) - var(--seam-3) - 7.4mm);
+  z-index:6;
+  padding:5.8mm 5mm 2.6mm 5mm;
+}
+.pj{ margin-bottom:2.5mm; }
+.pj:last-child{ margin-bottom:0; }
+.pj-head{
+  display:flex;
+  align-items:baseline;
+  gap:2.4mm;
+}
+.pj-name{
+  font-size:2.95mm;
+  font-weight:800;
+  color:var(--coal-900);
+  letter-spacing:.005em;
+}
+.pj-stack{
+  font-size:2.2mm;
+  font-weight:700;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color:var(--wine-600);
+  white-space:nowrap;
+}
+.pj-desc{
+  font-size:2.55mm;
+  line-height:1.46;
+  color:var(--coal-600);
+  margin-top:.55mm;
+}
+
+/* ── CONTACTS (2.2.2) — dark spine, centred ── */
+.contacts{
+  position:absolute;
+  left:0;
+  top:var(--seam-4);
+  width:var(--pillar);
+  height:calc(var(--page-h) - var(--seam-4));
+  z-index:6;
+  padding:6.6mm 4.6mm 5mm;
+  text-align:center;
+}
+.ct-list{
+  margin-top:3.8mm;
+  display:flex;
+  flex-direction:column;
+  gap:2.35mm;
+}
+.ct{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:2.2mm;
+  font-size:2.5mm;
+  font-weight:500;
+  color:var(--blue-200);
+  letter-spacing:.004em;
+}
+.ct i{
+  flex:0 0 auto;
+  width:4.2mm; height:4.2mm;
+  display:grid; place-items:center;
+  border-radius:50%;
+  font-size:2.1mm;
+  color:var(--wine-300);
+  background:rgba(255,255,255,.07);
+  box-shadow:inset 0 .2mm 0 rgba(255,255,255,.16);
+}
+
+/* ── CERTIFICATES (2.2.1) — light panel, pillar-aligned ── */
+.certs{
+  position:absolute;
+  left:calc(var(--pillar) + 3.4mm);
+  top:calc(var(--seam-4) + 3.4mm);
+  right:3.4mm;
+  bottom:4.4mm;
+  z-index:6;
+  padding:6mm 5mm 3.4mm 5mm;
+}
+.cert{
+  display:flex;
+  align-items:flex-start;
+  gap:2.6mm;
+  margin-bottom:2.5mm;
+}
+.cert:last-child{ margin-bottom:0; }
+.cert-mark{
+  flex:0 0 auto;
+  margin-top:.35mm;
+  width:3.6mm; height:3.6mm;
+  display:grid; place-items:center;
+  border-radius:1.2mm;
+  font-size:1.9mm;
+  color:#fff;
+  background:linear-gradient(160deg, var(--wine-400), var(--wine-700));
+  box-shadow:0 .35mm 1mm rgba(93,28,42,.4), inset 0 .2mm 0 rgba(255,255,255,.3);
+}
+.cert-body{ min-width:0; }
+.cert-name{
+  font-size:2.72mm;
+  font-weight:700;
+  line-height:1.3;
+  color:var(--coal-900);
+}
+.cert-note{
+  font-size:2.35mm;
+  line-height:1.35;
+  color:var(--blue-600);
+  margin-top:.3mm;
+}
+
+/* ── page-wide grain, the sanded finish ── */
+.grain{
+  position:absolute; inset:0;
+  z-index:40;
+  pointer-events:none;
+  opacity:.055;
+  mix-blend-mode:overlay;
+}
+
+@page{ size:188.8949mm 297mm; margin:0; }
+@media print{
+  body{ padding:0; background:#fff; }
+  .page{ box-shadow:none; }
+  *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ══ LAYER 0 — background fields ══ -->
+  <div class="field-portrait">
+    <img class="portrait" src="public/images/portrait-kamen-karchev-glow.png" alt="Kamen Karchev"/>
+  </div>
+  <div class="field-paper"></div>
+  <div class="spine spine-top"></div>
+  <div class="spine spine-bottom"></div>
+  <div class="field-panel"></div>
+
+  <!-- ══ LAYER 1 — content ══ -->
+
+  <!-- name + role — the bulging bar, breaking into the portrait field -->
+  <div class="namebar">
+    <div class="namebar-name">
+      <div class="n">Kamen<br/>Karchev</div>
+    </div>
+    <div class="namebar-role">
+      <div class="r">
+        Full-Stack<br/>Software Engineer
+        <em>Varna · Bulgaria</em>
+      </div>
+    </div>
+  </div>
+
+  <!-- about me -->
+  <div class="about bubble">
+    <span class="tag"><i class="fa-solid fa-user"></i>About Me</span>
+    <p>
+      Curious and <strong>self-motivated</strong> to experiment and innovate. Creative from an early
+      age, I was drawn to software engineering — where an idea becomes real with a few lines of code
+      and one or two cups of coffee. My skills don't vanish when I close the IDE: from building a
+      <strong>200k-view YouTube channel</strong> to working the event &amp; wedding industry and sales,
+      I've assembled a wide skillset that makes me <span class="accent">adaptable to any situation</span>.
+      That doesn't mean I've stopped learning — I'm excited to keep growing.
+    </p>
+  </div>
+
+  <!-- experience -->
+  <div class="experience bubble">
+    <span class="tag"><i class="fa-solid fa-briefcase"></i>Experience</span>
+
+    <div class="xp-row">
+      <div class="xp-when">Jul 22 – Feb 23</div>
+      <div class="xp-body">
+        <div class="xp-title">Software Engineering Intern</div>
+        <div class="xp-org">Quanterall</div>
+        <div class="xp-desc">
+          Kotlin mobile app on a live API, then <strong>Elixir</strong> backend — messaging logic for a
+          Discord-inspired chat service.
+        </div>
+      </div>
+    </div>
+
+    <div class="xp-row">
+      <div class="xp-when">May 2025</div>
+      <div class="xp-body">
+        <div class="xp-title">Network Infrastructure Intern</div>
+        <div class="xp-org">Asparuhovo Net · ISP</div>
+        <div class="xp-desc">
+          Real ISP infrastructure, protocols and hardware; modelled a business network in Cisco
+          Packet Tracer.
+        </div>
+      </div>
+    </div>
+
+    <div class="xp-row">
+      <div class="xp-when">2024 &amp; 2025</div>
+      <div class="xp-body">
+        <div class="xp-title">Seasonal Crew &amp; Trainer</div>
+        <div class="xp-org">Vermont Tent Company · USA</div>
+        <div class="xp-desc">
+          Two seasons abroad — cross-cultural teamwork in English, returning to train new crew.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- stack — on the spine, rhyming with the portrait above it -->
+  <div class="stack">
+    <div class="stack-head">Stack</div>
+    <div class="stack-grid">
+      <div class="chip lead">Java · Spring</div>
+      <div class="chip lead">C# · .NET</div>
+      <div class="chip">Elixir · Phoenix</div>
+      <div class="chip">Kotlin · Android</div>
+      <div class="chip">React · TS</div>
+      <div class="chip">PostgreSQL</div>
+      <div class="chip">Docker</div>
+      <div class="chip">C++</div>
+      <div class="chip">REST · OAuth</div>
+      <div class="chip">Grafana</div>
+    </div>
+  </div>
+
+  <!-- ══ the banner — breaks the two goldens ══ -->
+  <div class="banner">
+    <div class="cta">
+      <span class="cta-side">Go to</span>
+      <a class="cta-url" href="https://kamenkarchev.com">kamenkarchev<span>.com</span></a>
+      <span class="cta-side">for more</span>
+    </div>
+  </div>
+  <div class="highlights-tab"><i class="fa-solid fa-star"></i>Highlights</div>
+
+  <!-- education — spine, centred -->
+  <div class="education">
+    <div class="dark-head">Education</div>
+    <div class="edu-item">
+      <div class="edu-deg">B.Sc. Software &amp; Internet Technologies</div>
+      <div class="edu-school">Technical University of Varna</div>
+      <div class="edu-when">2022 – 2026</div>
+    </div>
+    <div class="edu-item">
+      <div class="edu-deg">Vocational High School of Electrical Engineering</div>
+      <div class="edu-school">Varna · GPA 3.58</div>
+      <div class="edu-when">2017 – 2022</div>
+    </div>
+  </div>
+
+  <!-- projects — light panel, pillar-aligned -->
+  <div class="projects bubble">
+    <span class="tag"><i class="fa-solid fa-cube"></i>Projects</span>
+
+    <div class="pj">
+      <div class="pj-head">
+        <span class="pj-name">History Interactive</span>
+        <span class="pj-stack">Elixir · Phoenix</span>
+      </div>
+      <div class="pj-desc">
+        Map-generation and community platform — resource-oriented REST API over PostgreSQL, SVG
+        territory rendering with client-side boolean geometry and server-cached shapes.
+      </div>
+    </div>
+
+    <div class="pj">
+      <div class="pj-head">
+        <span class="pj-name">DopeyUserAPI</span>
+        <span class="pj-stack">Phoenix · Docker</span>
+      </div>
+      <div class="pj-desc">
+        Scalable user-management service: registration, email verification, password reset and social
+        auth, instrumented with Oban, Prometheus and Grafana.
+      </div>
+    </div>
+
+    <div class="pj">
+      <div class="pj-head">
+        <span class="pj-name">Winery Operations</span>
+        <span class="pj-stack">Java</span>
+      </div>
+      <div class="pj-desc">
+        Multi-role platform for orders, inventory and task management — a team project centred on
+        software architecture and design patterns.
+      </div>
+    </div>
+  </div>
+
+  <!-- contacts — spine, centred -->
+  <div class="contacts">
+    <div class="dark-head">Contacts</div>
+    <div class="ct-list">
+      <div class="ct"><i class="fa-solid fa-envelope"></i>kamen.karchev03@gmail.com</div>
+      <div class="ct"><i class="fa-solid fa-phone"></i>+359 988 975 947</div>
+      <div class="ct"><i class="fa-brands fa-linkedin-in"></i>in/kamen-karchev</div>
+      <div class="ct"><i class="fa-brands fa-github"></i>KamenKarchev</div>
+    </div>
+  </div>
+
+  <!-- certificates — light panel, pillar-aligned -->
+  <div class="certs bubble">
+    <span class="tag"><i class="fa-solid fa-certificate"></i>Certificates</span>
+
+    <div class="cert">
+      <span class="cert-mark"><i class="fa-solid fa-check"></i></span>
+      <div class="cert-body">
+        <div class="cert-name">Student Science Session — TU Varna</div>
+        <div class="cert-note">Co-authored &amp; presented a paper on team management and crisis prevention in cybersecurity.</div>
+      </div>
+    </div>
+
+    <div class="cert">
+      <span class="cert-mark"><i class="fa-solid fa-check"></i></span>
+      <div class="cert-body">
+        <div class="cert-name">Professional Qualification Certificate</div>
+        <div class="cert-note">Software development · GPA 3.58</div>
+      </div>
+    </div>
+
+    <div class="cert">
+      <span class="cert-mark"><i class="fa-solid fa-check"></i></span>
+      <div class="cert-body">
+        <div class="cert-name">Languages</div>
+        <div class="cert-note">Bulgarian — native · English — fluent, professional</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ LAYER 2 — grain ══ -->
+  <svg class="grain" xmlns="http://www.w3.org/2000/svg">
+    <filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+    <rect width="100%" height="100%" filter="url(#g)"/>
+  </svg>
+
+</div>
+
+</body>
+</html>
