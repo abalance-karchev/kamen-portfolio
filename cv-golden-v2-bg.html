@@ -1,11 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bg">
 <head>
   <meta charset="UTF-8"/>
-  <title>Kamen Karchev — CV</title>
+  <title>Камен Карчев — CV</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <!-- Fraunces has no Cyrillic glyphs — it's used only for the name/role
+       and the banner URL, both of which mix in Latin brand/proper-noun
+       text; Cyrillic characters there will fall back to the browser's
+       default serif, off-matched from Fraunces' weight/size. Manrope
+       covers everything else and does have full Cyrillic support. -->
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&family=Spectral:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
   <style>
     /* ═══════════════════════════════════════════════════════════════════
@@ -162,7 +167,7 @@
       align-items:flex-start;
       padding:26px 0;
       background:#0a0b0f;
-      font-family:'Plus Jakarta Sans', system-ui, sans-serif;
+      font-family: 'Manrope', sans-serif;
       -webkit-font-smoothing:antialiased;
     }
 
@@ -239,6 +244,7 @@
       width:var(--pillar);
       overflow:hidden;          /* clips the texture layer to the rounded shape */
       z-index:3;
+      font-family:'Manrope', sans-serif;
     }
     /* reeded texture — its own layer: behind the content, above the base gradient */
     .spine::before{
@@ -362,7 +368,7 @@
     }
     /* every line in the header shares the title's font, size and style */
     .title-line{
-      font-family:'Fraunces', serif;
+      font-family: 'Fraunces', serif;
       font-weight:600;
       font-size:6.6mm;
       line-height:1.02;
@@ -398,10 +404,10 @@
       width:37.8mm;              /* fixed — right edge lands the same distance from line6 (116.75mm) as its left edge sits from the pillar */
       display:inline-flex;
       align-items:center;
-      justify-content:center;
-      gap:1.6mm;
+      justify-content:flex-start;
+      gap:1mm;
       height:5.4mm;
-      padding:0 3.4mm;
+      padding:0 1.4mm 0 2mm;
       border-radius:var(--radius) var(--radius-sub) var(--radius) var(--radius-sub);
       font-size: 3mm;
       font-weight:800;
@@ -414,8 +420,10 @@
               0 .9mm 2.4mm rgba(14,17,25,.32),
               inset 0 .3mm 0 rgba(255,255,255,.2);
       z-index:2;
+      font-family:'Manrope', sans-serif;
     }
-    .tag i{font-size:3.4mm;color: var(--wine-300);}
+    .tag i{flex:0 0 auto;font-size:3.4mm;color: var(--wine-300);}
+    .tag span{flex:1 1 auto;text-align:center;}
 
     /* ── ABOUT ME (1.1.1 bottom) ──
        header at the pillar; prose runs the full width, ignoring the
@@ -430,7 +438,7 @@
       padding:6.4mm 6mm 4.6mm 6mm;
     }
     .about p{
-      font-size: 3.3mm;
+      font-size: 3.0mm;
       line-height:1.68;
       font-weight:500;
       color:#000;
@@ -448,10 +456,11 @@
       height:60.9mm;
       z-index:5;
       padding:5.8mm 5.4mm 2.2mm 5.4mm;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
     }
-    .xp-row{
-      margin-bottom:2.3mm;
-    }
+    .xp-row{}
     .xp-row:last-child{ margin-bottom:0; }
     .xp-body{ flex:1; min-width:0; }
     .xp-headrow{
@@ -480,6 +489,7 @@
       font-size: 2.85mm;
       font-weight:600;
       color: var(--sky-blue);
+      font-family:'Manrope', sans-serif;
     }
     .xp-org .dot{
       color:var(--blue-400);
@@ -493,6 +503,7 @@
       text-transform:uppercase;
       color: var(--sky-blue);
       white-space:nowrap;
+      font-family:'Manrope', sans-serif;
     }
     .xp-desc{
       font-size: 3mm;
@@ -512,6 +523,7 @@
       z-index:6;
       padding:0 3.4mm 3.4mm 3.4mm;
       text-align:center;
+      font-family:'Manrope', sans-serif;
     }
     /* flag/polygon badge — pulled out of flow and up 6.4px so it pokes
        into the curved area above .stack, independent of the STACK label */
@@ -627,6 +639,7 @@
       align-items:center;
       justify-content:center;
       overflow:hidden;
+      font-family:'Manrope', sans-serif;
       background: linear-gradient(
 108deg, var(--coal-900) 0%, var(--coal-800) 18%, var(--wine-700) 37%, var(--wine-500) 48%, var(--wine-600) 75%, var(--wine-700) 100%);
       box-shadow:
@@ -878,6 +891,7 @@
       text-transform:uppercase;
       color:var(--wine-600);
       white-space:nowrap;
+      font-family:'Manrope', sans-serif;
     }
     .pj-year{
       margin-left:auto;
@@ -886,6 +900,7 @@
       letter-spacing:.05em;
       color:var(--wine-600);
       white-space:nowrap;
+      font-family:'Manrope', sans-serif;
     }
     .pj-desc{
       font-size: 3mm;
@@ -930,7 +945,7 @@
       box-shadow:
               inset 0 .22mm 0 rgba(255,255,255,.16),
               0 .4mm 1mm rgba(0,0,0,.3);
-      font-size:3mm;
+      font-size: 3.4mm;
       font-weight:600;
       color:var(--blue-200);
       letter-spacing:.012em;
@@ -1032,39 +1047,41 @@
   <!-- name + role — the bulging bar, breaking into the portrait field -->
   <div class="namebar">
     <div class="namebar-name">
-      <div class="title-line">Kamen</div>
-      <div class="title-line line2">Karchev</div>
+      <div class="title-line">Камен</div>
+      <div class="title-line line2">Карчев</div>
     </div>
     <div class="namebar-role">
       <div class="title-line">Full-Stack</div>
-      <div class="title-line line2">Software Engineer</div>
+      <div class="title-line line2">Софтуерен инженер</div>
     </div>
   </div>
 
   <!-- about me -->
   <div class="about bubble">
-    <span class="tag"><i class="fa-solid fa-user"></i>About Me</span>
+    <span class="tag"><i class="fa-solid fa-user"></i><span>За мен</span></span>
     <p>
-      Curious and self-motivated. <strong>Creative</strong> from an early age, I was drawn to software engineering — where an idea becomes real with a few lines of code and one or two cups of <strong>coffee</strong>. My skills don't vanish when I close the IDE: from building <strong>a YouTube channel</strong> to working in the event & wedding industry, I've assembled a wide skillset that makes me adaptable to any situation. That doesn't mean I've stopped learning — I'm excited to keep growing and working on my career.
+      Аз съм <strong>любопитен и самомотивиран</strong>. Творчески настроен от ранна възраст, софтуерното инженерство ме привлече, защото една идея може да стане реалност с няколко реда код и една-две чаши кафе.
+      Уменията ми не се ограничават до IDE-то, от <strong>изграждането</strong> на YouTube канал до организирането на сватби в Америка, съм натрупал опит в разнообразни и с различни хора.
+      Това не означава, че съм спрял да уча - точно обратното. Стремя се към постоянно <strong>развитие</strong> и към <strong>изграждането</strong> на реномирана кариера.
     </p>
   </div>
 
   <!-- experience -->
   <div class="experience bubble">
-    <span class="tag"><i class="fa-solid fa-briefcase"></i>Experience</span>
+    <span class="tag"><i class="fa-solid fa-briefcase"></i><span>Опит</span></span>
 
     <div class="xp-row">
       <div class="xp-body">
         <div class="xp-headrow">
-          <div class="xp-title">Software Engineering Intern</div>
+          <div class="xp-title">Стажант софтуерен разработчик</div>
           <div class="xp-meta">
             <div class="xp-org">Quanterall</div>
-            <div class="xp-when">Jul 2022 – Feb 2023</div>
+            <div class="xp-when">07.2022 – 02.2023</div>
           </div>
         </div>
         <div class="xp-desc">
-          Introduction to <strong>Kotlin</strong>, deep dive into <strong>Erlang</strong> then <strong>Elixir</strong>. Built a
-          <strong>chat service inspired by Discord</strong> in Elixir, and a <strong>graph path-finding program</strong> in Erlang.
+          Въведение в <strong>Kotlin</strong>, задълбочена работа с <strong>Erlang</strong>, после <strong>Elixir</strong>. Изградих
+          <strong>чат услуга, вдъхновена от Discord</strong> в Elixir, и <strong>пресмятане на най-къс път в граф</strong>, на Erlang.
         </div>
       </div>
     </div>
@@ -1072,15 +1089,15 @@
     <div class="xp-row">
       <div class="xp-body">
         <div class="xp-headrow">
-          <div class="xp-title">Network Infrastructure Intern</div>
+          <div class="xp-title">Стаж в Интернет Доставчик</div>
           <div class="xp-meta">
-            <div class="xp-org">Asparuhovo Net</div>
-            <div class="xp-when">May - April 2025</div>
+            <div class="xp-org">Аспарухово Нет</div>
+            <div class="xp-when">04 - 05.2025</div>
           </div>
         </div>
         <div class="xp-desc">
-          Worked in a real ISP environment <strong>with infrastructure</strong>, protocols and hardware. Modelled a
-          business network in Cisco Packet Tracer.
+          Работих в реална ISP среда <strong>с инфраструктура</strong>, протоколи и хардуер. Моделирах
+          бизнес мрежа в Cisco Packet Tracer.
         </div>
       </div>
     </div>
@@ -1095,8 +1112,9 @@
           </div>
         </div>
         <div class="xp-desc">
-          Three seasons in the USA with cross-cultural teamwork in English. Learned what it's like to be
-          responsible for crew and company assets. Had my longest shift at around 13 hours.
+          Три сезона в <strong>САЩ</strong>.
+          Научих какво е да <strong>отговаряш</strong> за екип и фирмена собственост.
+          Работих най-дългата си смяна, продължила 13 часа.
         </div>
       </div>
     </div>
@@ -1105,7 +1123,7 @@
   <!-- stack — on the spine, rhyming with the portrait above it -->
   <div class="stack">
     <div class="stack-flag"></div>
-    <div class="stack-head">Stack</div>
+    <div class="stack-head">Технологии</div>
     <div class="stack-columns">
       <div class="stack-col">
         <div class="chip lead">Java · Spring</div>
@@ -1127,26 +1145,26 @@
   <!-- ══ the banner — breaks the two goldens ══ -->
   <div class="banner">
     <div class="cta">
-      <span class="cta-side cta-side-left">Go to</span>
+      <span class="cta-side cta-side-left">Посети</span>
       <a class="cta-url" href="https://kamenkarchev.com" target="_blank" rel="noopener noreferrer">kamenkarchev<span>.com</span></a>
-      <span class="cta-side">for more</span>
+      <span class="cta-side">за повече</span>
     </div>
   </div>
 
   <!-- education + contacts — one spine-bottom parent, bg delegated to it -->
   <div class="spine spine-bottom">
     <div class="education">
-      <div class="dark-head">Education</div>
+      <div class="dark-head">Образование</div>
       <div class="single-col">
         <div class="stack-col stack-col-legacy">
           <div class="edu-item">
-            <div class="edu-deg">Bachelor of Software &amp; Internet Technologies</div>
-            <div class="edu-school">Technical University of Varna</div>
+            <div class="edu-deg">Бакалавър по софтуерни и интернет технологии</div>
+            <div class="edu-school">Технически университет – Варна</div>
             <div class="edu-when">2022 – 2026</div>
           </div>
           <div class="edu-item">
-            <div class="edu-deg">Professional Qualification Diploma</div>
-            <div class="edu-school">Vocational High School of Electrical Engineering</div>
+            <div class="edu-deg">Диплома за професионална квалификация</div>
+            <div class="edu-school">Професионална гимназия по електротехника</div>
             <div class="edu-when">2017 – 2022</div>
           </div>
         </div>
@@ -1154,7 +1172,7 @@
     </div>
 
     <div class="contacts">
-      <div class="dark-head">Contacts</div>
+      <div class="dark-head">Контакти</div>
       <div class="single-col">
         <div class="stack-col stack-col-legacy">
             <div class="ct"><div class="ct-span"><span>kamen.karchev03@gmail.com</span></div><i class="fa-solid fa-envelope"></i></div>
@@ -1168,16 +1186,16 @@
 
   <!-- highlights — projects + certificates merged, light panel, pillar-aligned -->
   <div class="highlights bubble">
-    <span class="tag"><i class="fa-solid fa-star"></i>Highlights</span>
+    <span class="tag"><i class="fa-solid fa-star"></i><span>Постижения</span></span>
 
     <div class="pj">
       <div class="pj-head">
-        <a class="pj-name" href="https://www.youtube.com/watch?v=yHK1hsz3oXY" target="_blank" rel="noopener noreferrer">YouTube Channel</a>
-        <span class="pj-stack">Content Creation · SEO · Adobe</span>
+        <a class="pj-name" href="https://www.youtube.com/watch?v=yHK1hsz3oXY" target="_blank" rel="noopener noreferrer">YouTube канал</a>
+        <span class="pj-stack">Съдържание · SEO · Adobe</span>
         <span class="pj-year">2024</span>
       </div>
       <div class="pj-desc">
-        Built a YouTube channel. Best video, on AI, gained <strong>200,000+ views</strong>.
+        Най-доброто ми видео, за AI, събра <strong>200 000+ гледания</strong>.
       </div>
     </div>
 
@@ -1188,9 +1206,8 @@
         <span class="pj-year">2026</span>
       </div>
       <div class="pj-desc">
-        Interactive platform for a real YouTuber's (not me) community. <strong>Microservice
-        backend</strong> with caching, focused on efficiency. Frontend focused on territory
-        geometry. <strong>Deployed and accessible</strong> in beta!
+        Интерактивна платформа кято разработвам за зрителите на YouTube канал с 100000+ абоната. <strong>Микросървисен
+        бекенд</strong> с кеширане, фокусиран върху ефективност и фронтенд който генерира графиките.<strong>Пуснат и достъпен</strong> в бета!
       </div>
     </div>
 
@@ -1201,32 +1218,31 @@
         <span class="pj-year">2026</span>
       </div>
       <div class="pj-desc">
-        <strong>Scalable</strong> user-management service. Wanted to build it as close to <strong>production
-        standards</strong> as possible. Used in History Interactive! Can send <strong>real emails, login via
-        Google/GitHub</strong> and more.
+        <strong>Мащабируема</strong> услуга за управление на потребители.
+        Стремя се към <strong>продукционен стандарт</strong>. Верификация, логин и т.н.
       </div>
     </div>
 
     <div class="pj">
       <div class="pj-head">
-        <a class="pj-name" href="https://kamenkarchev.com/documents/Certificate_of_Attendance_EPITA.pdf" target="_blank" rel="noopener noreferrer">EPITA Summer School</a>
+        <a class="pj-name" href="https://kamenkarchev.com/documents/Certificate_of_Attendance_EPITA.pdf" target="_blank" rel="noopener noreferrer">EPITA лятна школа</a>
         <span class="pj-stack">LLM · MCP · RAG</span>
         <span class="pj-year">2026</span>
       </div>
       <div class="pj-desc">
-        International summer school in Paris. Math,
-        prompt engineering, <strong>RAG and MCP servers</strong> and a business visits. Team assignment making an <strong>"AI Event Organisation App"</strong>.
+        Международнен университет в Париж. Математика,
+        prompt engineering, <strong>RAG и MCP</strong> и бизнес посещения. Екипна задача, създаване на <strong>"AI приложение за организиране на събития"</strong>.
       </div>
     </div>
 
     <div class="pj">
       <div class="pj-head">
-        <a class="pj-name" href="https://kamenkarchev.com/documents/Student_Science_Session_Certificate.pdf" target="_blank" rel="noopener noreferrer">Student Science Session</a>
-        <span class="pj-stack">Soft-Skills · Cybersecurity</span>
+        <a class="pj-name" href="https://kamenkarchev.com/documents/Student_Science_Session_Certificate.pdf" target="_blank" rel="noopener noreferrer">Научна сесия</a>
+        <span class="pj-stack">Soft Skills · Cybersecurity</span>
         <span class="pj-year">2026</span>
       </div>
       <div class="pj-desc">
-        <strong>Co-authored</strong> a paper on team management and crisis prevention in cybersecurity. Presented in front of a <strong>university jury</strong>!
+        <strong>Съавтор</strong> на доклад управление на екипи и кризи в киберсигурността. Представен пред <strong>университетско жури</strong>!
       </div>
     </div>
 
@@ -1237,8 +1253,8 @@
         <span class="pj-year">2025</span>
       </div>
       <div class="pj-desc">
-        <strong>Multi-role</strong> platform for order, inventory and task management in a winery. Team project focused
-        on <strong>software architecture</strong>, SOLID OOP and <strong>design patterns</strong>. Experience with <strong>version control</strong> cooperation.
+        <strong>Многоролева</strong> платформа за управление на винарна. Екипен проект, фокусиран
+        върху <strong>софтуерна архитектура</strong>, SOLID OOP и <strong>дизайн шаблони</strong>. Опит с <strong>version control</strong> сътрудничество.
       </div>
     </div>
 

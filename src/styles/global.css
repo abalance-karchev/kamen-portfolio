@@ -26,6 +26,33 @@
   --shadow-lg: 0 42px 90px rgba(112,58,52,.18);
 }
 
+/* ── GOLDEN SPINE ──────────────────────────────────────────────────────────
+   One authority for page geometry, replacing the old --slot-screens /
+   --slot / --head-h math. Every page is exactly one screen ("one post"):
+
+     [ --head-space ]  room every page reserves for its own heading. This is
+                       a shared *measure*, not a shared element — each page
+                       holds its own heading in flow, so a snapped page
+                       necessarily presents it in the same place the last one
+                       did. The nav is a normal page element of the same
+                       height, which is why the peek copy lands exactly over
+                       a heading: same measure, not a shared container.
+     [ --stage-h    ]  everything below it — holds the golden rectangle
+
+   The rect is the largest phi:1 box that fits the stage, centered. Both
+   dimensions use min() against the same two bounds, so whichever axis binds,
+   the pair stays consistent (if avail-w <= avail-h*phi then avail-w/phi <=
+   avail-h, and vice versa) — no over-constrained box, no silently violated
+   ratio. Portrait opts out entirely and fills the stage (a phone screen
+   shouldn't be letterboxed into a landscape golden rect). */
+:root {
+  --phi: 1.618033988749;
+  --head-space: 10dvh;
+  --stage-h: calc(100dvh - var(--head-space));
+  --stage-gutter: 1rem;
+  --stage-max-w: 1320px;
+}
+
 [data-theme="dark"] {
   --font-display: 'Instrument Serif', Georgia, serif;
   --font-prose: 'Instrument Serif', Georgia, serif;
@@ -67,6 +94,17 @@
   --accent-gradient-soft: linear-gradient(120deg, var(--primary), var(--primary-soft));
 }
 
+/* data-viewclass is set by useSlotMetrics(). Page geometry itself now comes
+   from the golden spine above. */
+:root {
+  --snap-offset: 0px;
+}
+/* Header only actually covers content while peeking — scroll-snap targets
+   should only reserve room for it then, not while it's hidden off-screen. */
+html[data-nav="peek"] {
+  --snap-offset: var(--nav-h, 0px);
+}
+
 /* Shared image-surface gradient:
    bright diamond center at x=50%, y=66.67% (1/3 up from bottom). */
    :root {
@@ -95,8 +133,15 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html {
-  scroll-behavior: smooth;
+  /* Mandatory snap, deliberately — this is a reel. A page can't be left
+     parked half-way: releasing mid-scroll either settles back or advances,
+     never rests between. An earlier JS threshold implementation gave a
+     "drift and stay" feel that read as having no stickiness at all; the
+     tunable-radius problem that originally motivated it doesn't apply now
+     that every page is exactly one screen, so snap positions are one
+     viewport apart and "nearest" is never ambiguous. */
   overflow-x: clip;
+  scroll-snap-type: y mandatory;
 }
 
 body {
@@ -111,7 +156,7 @@ body {
     radial-gradient(circle at 15% 0%, var(--glow), transparent 24%),
     radial-gradient(circle at 92% 12%, rgba(255,255,255,.04), transparent 16%),
     linear-gradient(180deg, var(--bg-2), var(--bg) 34%, var(--bg));
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 body::before {
@@ -146,8 +191,7 @@ body::before {
 .brand-wrap span,
 .btn,
 .switch-knob,
-.quick-card strong,
-.quick-card span,
+.stack-chip,
 .tag,
 .project-body,
 .feature-video-empty,
@@ -169,13 +213,60 @@ img { display: block; max-width: 100%; }
 #root { position: relative; z-index: 1; }
 .wrap { width: min(calc(100% - 2rem), 1320px); margin: 0 auto; container-type: inline-size; container-name: site; }
 
-/* NAV */
+/* NAV — reveal-on-demand via data-nav (useNavReveal), same behavior on both
+   viewclasses: mobile articles need the header's flow space back as much as
+   desktop does. Base rule below is the pre-JS fallback (first paint / no-JS). */
 .nav {
   position: sticky; top: 0; z-index: 90;
   backdrop-filter: blur(20px);
   background: color-mix(in srgb, var(--bg) 74%, transparent);
   border-bottom: 1px solid var(--line);
 }
+.nav-spacer { height: 0; }
+
+html[data-nav] .nav {
+  position: static;
+  transform: translateY(0);
+  transition: transform .28s cubic-bezier(.16, 1, .3, 1);
+  will-change: transform;
+}
+/* The nav is a normal element at the top of the document, and its own snap
+   position (scrollY 0) — the opening view: menu, masthead, most of the front
+   page. Scrolling once lands on the next snap position, the first page's
+   top, where the masthead heading sits in the head space and the front page
+   is fully visible.
+
+   Unconditional, not gated on data-nav="rest": the gated version stopped
+   applying the moment the user left scroll 0, so 0 ceased to be a snap
+   position and mandatory snapping immediately pulled the page down to the
+   first article — the opening view was unreachable, including on load. */
+.nav { scroll-snap-align: start; }
+/* Nav height matches --head-space so the peek copy lands exactly over
+   whatever heading is in that space. Same measure, not a shared container. */
+.nav-inner { min-height: calc(var(--head-space) - 1px); } /* -1px: the nav's own border-bottom */
+
+/* "hidden" is not a transform — the nav simply stays in flow and scrolls
+   away like any other content. Only "peek" lifts it out of flow, as a second
+   copy overlaying the top of the viewport. Keeping the nav in flow for both
+   resting states is what stops the page from shifting: a static↔fixed swap
+   at the scroll-0 boundary moved every snap position by the nav's height
+   mid-gesture, which mandatory snapping then fought. */
+html[data-nav="peek"] .nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+/* Reserves the flow height the nav gives up while it is overlaying, so
+   removing it from flow doesn't pull the document up by its height. */
+html[data-nav="peek"] .nav-spacer { height: var(--nav-h, 0px); }
+/* No spacer is reserved when the nav goes fixed — content *should* shift up
+   to reclaim that space. At rest the nav sits in flow and pushes the first
+   page down by its own height, so the golden rect is cut off at the bottom
+   by exactly that much: the deliberate "there is more below" affordance on
+   first paint. The moment the nav retracts, the rect settles into the full
+   stage. */
+.nav-spacer { height: 0; }
 .nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .85rem 0; }
 .logo { width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center; border: 1px solid var(--line); background: linear-gradient(145deg, color-mix(in srgb, var(--primary) 24%, var(--paper)), var(--paper-2)); box-shadow: var(--shadow); flex-shrink: 0; }
 .brand-wrap { display: flex; align-items: center; gap: .85rem; }
@@ -302,7 +393,74 @@ img { display: block; max-width: 100%; }
 }
 
 /* MASTHEAD */
+/* ── HEAD SPACE ──
+   Not an element: a measure. Every page reserves --head-space at its top for
+   its own in-flow heading, and the stage takes the rest. Because the measure
+   is shared, a snapped page always presents its heading where the previous
+   page presented its own. */
+.page-head {
+  flex: 0 0 var(--head-space);
+  height: var(--head-space);
+  width: min(100% - 2 * var(--stage-gutter), var(--stage-max-w));
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+}
+.page-head .rule { flex: 1; }
+.page-head-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: clamp(1.1rem, 3.2dvh, 2rem);
+  letter-spacing: .04rem;
+}
+/* The stage: everything below the heading, where the golden rect is centred. */
+.page-stage {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The front page's heading is the masthead, keeping its original composition
+   (meta · title · meta over a double rule) at the shared head-space scale. */
+.masthead--head {
+  padding: 0;
+  border-bottom: 0;
+  display: flex;
+  align-items: center;
+}
+.masthead--head .masthead-top {
+  width: 100%;
+  gap: 1rem;
+  padding-bottom: .3rem;
+  align-items: end;
+  border-bottom: 3px double var(--line-strong);
+}
+.masthead--head .paper-title {
+  font-size: clamp(1.3rem, 4.4dvh, 2.9rem);
+  line-height: .9;
+  letter-spacing: .08rem;
+  white-space: nowrap;
+}
+.masthead--head .masthead-meta {
+  gap: 0;
+  font-size: clamp(.5rem, 1.15dvh, .68rem);
+  line-height: 1.25;
+}
+
 .masthead { padding: 2rem 0 1.2rem; border-bottom: 1px solid var(--line-strong); }
+/* Portrait only — name already appears in the nav brand and the portrait
+   caption, and the space is worth more than the redundant masthead. Easy to
+   revert: delete this rule. Desktop keeps it. */
+html[data-viewclass="portrait"] .masthead { display: none; }
 .masthead-top { display: grid; grid-template-columns: minmax(0, 220px) 1fr minmax(0, 220px); gap: 1rem; align-items: end; padding-bottom: 1rem; border-bottom: 3px double var(--line-strong); }
 .paper-title { font-family: var(--font-display); font-size: clamp(3.04rem, 2.2vw + 5.5cqi, 7.04rem); line-height: .88; letter-spacing: 0.104rem; font-weight: 700; text-align: center; }
 .masthead-meta { display: grid; gap: .2rem; font-size: clamp(calc(0.656rem + 2px), calc(0.6rem + 0.22cqi), calc(0.82rem + 2.5px)); color: var(--muted); }
@@ -327,11 +485,23 @@ img { display: block; max-width: 100%; }
   opacity: .6;
 }
 
-/* NEWSPAPER PAGE */
+/* NEWSPAPER PAGE — one screen per page ("one post"). Content sits in the
+   stage below the fixed universal header band; the band overlays the
+   padding-top strip reserved for it here. */
 .newspaper-page {
   position: relative;
-  padding: 1rem 0;
+  min-height: 100dvh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   overflow-x: clip;
+  /* Snap target must be this untransformed wrapper, not .section-head inside
+     it — that lives under .newspaper-page-inner, which carries live
+     rotateX/scale/x/y scroll-linked transforms and would resolve the snap
+     port against its own distorted, moving box. */
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  scroll-margin-top: 0;
 }
 .newspaper-page-inner {
   will-change: transform, opacity;
@@ -339,96 +509,84 @@ img { display: block; max-width: 100%; }
   backface-visibility: hidden;
   container-type: inline-size;
   container-name: page-section;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Full width, so a child sizing itself with a percentage has a definite
+     basis to resolve against instead of collapsing to zero. */
+  width: 100%;
 }
 
-/* TALL ARTICLES — Feature, Projects, Contact get 2× screen height on desktop */
-.newspaper-page--tall .glass {
-  aspect-ratio: 6.33/9;
-  height: 222vh;
-  width: auto;
-  max-width: min(95vw, 100%);
-  margin: 0 auto;
+/* ── GOLDEN RECTANGLE ──
+   The page's content box: largest phi:1 rect fitting the stage. */
+.golden-rect {
+  --avail-w: min(100vw - 2 * var(--stage-gutter), var(--stage-max-w));
+  --avail-h: calc(var(--stage-h) - 2 * var(--stage-gutter));
+  width: min(var(--avail-w), calc(var(--avail-h) * var(--phi)));
+  height: min(var(--avail-h), calc(var(--avail-w) / var(--phi)));
+  /* The rect is a flex item of .newspaper-page-inner; without this, a
+     `flex: 1 1 0` inherited from the old article rules sets basis 0 and the
+     computed width above is ignored entirely (box collapses to content). */
+  flex: 0 0 auto;
+  container-type: size;
+  container-name: golden;
 }
 
-/* HERO */
-#hero {
-  aspect-ratio: 1.71754;
-  height: 90vh;
-  width: auto;
-  max-width: min(95vw, 100%);
-  margin: 0 auto;
+/* Golden subdivision. flex-grow phi:1 divides the free space in the golden
+   ratio, so `major` : `minor` is phi:1 along the split axis. Basis is 0 so
+   content size never perturbs the ratio — the whole point is that the
+   proportion is authored, not emergent. */
+.golden-split {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
 }
-/* Row 2 is the building banner: auto-sized, so the panels absorb its height
-   inside #hero's fixed 90vh rather than pushing content below the fold. */
-.hero-grid { display: grid; grid-template-columns: 1.15fr .85fr; grid-template-rows: 1fr auto; gap: 1.2rem; padding: 1.4rem 0 0; }
+.golden-split--col { flex-direction: column; }
+.golden-split > .major,
+.golden-split > .minor {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.golden-split > .major { flex: var(--phi) 1 0; }
+.golden-split > .minor { flex: 1 1 0; }
+
+/* HERO — geometry comes from .golden-rect / .golden-split on the element. */
+/* Hero = the golden rect itself; .golden-split supplies the phi division
+   between copy (major) and the portrait column (minor). */
+.hero-grid { gap: var(--stage-gutter); }
 .hero-copy.glass,
 .hero-side.glass {
   container-type: size;
   container-name: hero-panel;
 }
-.hero-copy, .hero-side { padding: 1.5rem; }
-.hero-side { display: flex; flex-direction: column; gap: 1rem; }
+.hero-copy { padding: 1.5rem; }
+.hero-side { gap: var(--stage-gutter); }
 .hero-copy {
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 .hero-copy-text {
-  flex: 0 0 60%;
+  flex: var(--phi) 1 0;
   min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: .45rem;
+  gap: .5rem;
 }
-.hero-copy-text h2,
-.hero-copy-text p {
-  margin: 0;
-}
-.hero-copy > .smallcaps {
+.hero-copy-text > .smallcaps {
   flex: 0 0 auto;
-  overflow: hidden;
-  font-size: clamp(0.55rem, 0.4rem + 1.2cqw + 0.4cqh, 0.85rem);
+  font-size: 17px;
 }
-.hero-copy h2 {
-  font-family: var(--font-display);
-  flex: 0 0 auto;
-  overflow: hidden;
-  font-size: clamp(1.6rem, 1.2rem + 2.4cqw + 1.8cqh, 4.16rem);
-  line-height: .9;
-  letter-spacing: clamp(0.048rem, 0.036rem + 0.08cqw, 0.104rem);
-  font-weight: 700;
-  margin: 0;
-  width: 100%;
-  max-width: 100%;
-}
-.hero-copy p {
-  flex: 0 0 auto;
-  overflow: hidden;
-  font-size: clamp(0.62rem, 0.5rem + 1.4cqw + 0.5cqh, 1.04rem);
-  line-height: 1.55;
-  color: var(--muted);
-  width: 100%;
-  max-width: 100%;
-  margin: 0;
-}
-.hero-actions-grid { 
+.hero-actions-grid {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  flex: 0 0 40%;
-  min-height: 0;
-  overflow: hidden;
-  gap: .6rem;
-}
-.actions-label { flex: 0 0 auto; font-size: clamp(.5rem, .38rem + .9cqw, .72rem); color: var(--muted); }
-.hero-actions {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: .5rem;
   flex: 1 1 0;
   min-height: 0;
   overflow: hidden;
+  gap: .6rem;
 }
 .btn {
   display: flex;
@@ -451,52 +609,105 @@ img { display: block; max-width: 100%; }
   height: 100%;
   text-shadow: 0 1px 6px rgba(0,0,0,.35);
 }
-.btn-fit {
+.btn:hover { filter: brightness(1.12); }
+
+/* ── "MY STACK" — radio-button-style tech chips ── */
+.hero-stack {
   flex: 1 1 0;
-  min-width: 0;
   min-height: 0;
   overflow: hidden;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-wrap: wrap;
+  align-content: center;
+  gap: 10px;
 }
-.btn:hover { filter: brightness(1.12); }
-.quick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; flex: 1 1 0; min-height: 0; overflow: hidden; }
-.quick-card { padding: .5rem .6rem; border-radius: 14px; border: 1px solid var(--line); background: var(--paper-2); overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
-.quick-card strong { display: block; font-size: clamp(0.5rem, 0.42rem + 0.95cqw, 0.59rem); text-transform: uppercase; color: var(--muted); margin-bottom: .3rem; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
-.quick-card span { font-size: clamp(0.62rem, 0.54rem + 1.05cqw, 0.74rem); font-weight: 600; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; display: block; }
-.portrait { flex: 1 1 0; min-height: 0; border-radius: 22px; border: 1px solid var(--line); background: var(--image-surface); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.stack-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .5rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--paper-2);
+  font-family: var(--font-tech);
+  font-weight: 600;
+  font-size: 19px;
+  white-space: nowrap;
+}
+.stack-chip-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.stack-chip-dot::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+/* The portrait column's own phi division: photo = major, quote = minor.
+   Sizing comes from .golden-split's major/minor rules — only appearance is
+   set here. */
+.portrait { min-height: 0; border-radius: 22px; border: 1px solid var(--line); background: var(--image-surface); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
 .portrait-img { width: auto; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; object-position: center; flex-shrink: 0; }
 .caption { position: absolute; left: 1rem; right: 1rem; bottom: 1rem; padding: .8rem .95rem; border-radius: 16px; border: 1px solid var(--line); background: color-mix(in srgb, var(--paper) 76%, transparent); backdrop-filter: blur(10px); }
 .caption strong { display: block; font-size: clamp(calc(0.72rem + 2px), calc(0.66rem + 0.9cqw), calc(0.9rem + 2.5px)); margin-bottom: .25rem; }
 .caption span { font-size: clamp(calc(0.656rem + 2px), calc(0.58rem + 0.95cqw), calc(0.82rem + 2.5px)); color: var(--muted); }
 .pull-quote {
+  min-height: 0;
+  overflow: hidden;
   padding: 1rem 1.1rem 1rem calc(1.1rem + 3px);
   /* Gradient rule as a background layer rather than border-image — border-image
-     would suppress the 0 18px 18px 0 radius. */
+     would suppress the radius. */
   background:
     var(--accent-gradient-soft) left / 3px 100% no-repeat,
     color-mix(in srgb, var(--paper-2) 84%, var(--accent));
-  border-radius: 0 18px 18px 0;
-  font-family: var(--font-display);
-  font-size: clamp(0.85rem, 0.72rem + 2.05cqw + 0.35cqh, 0.93rem);
-  line-height: 1.45;
-  font-style: italic;
-  font-weight: 600;
-  letter-spacing: clamp(0.048rem, 0.036rem + 0.06cqw, 0.104rem);
+  letter-spacing: .065rem;
+}
+
+/* ── UNIFORM-SCALE AUTHORING ──
+   Fixed design-canvas content (see useFitScale.js), scaled to fit a real,
+   viewport-derived slot instead of independently shrink-fitting each element.
+   `.fit-scale-slot` is the measured box; `.fit-scale-canvas` is the fixed-px
+   authored content, centered in the slot at whatever scale fits (aspect
+   preserved, letterboxed if the slot's aspect differs from the design's). */
+.fit-scale-slot {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+}
+.fit-scale-canvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: center center;
+}
+/* Left-anchored variant: vertical centering only, horizontal edge pinned to
+   the slot's left edge — for stacks of independently-scaled canvases that
+   must share a common left edge (e.g. Hero's title/stack blocks lining up
+   with BuildingBanner, which is normal-flow and always left-anchored). */
+.fit-scale-canvas--left {
+  left: 0;
+  transform-origin: top left;
 }
 
 /* ── "CURRENTLY BUILDING" BANNER ──
-   Proportioned like a live video bar: full hero width, deliberately short. It
-   is an accent on the hero, not a second hero — if it ever starts competing
-   with the portrait for attention, shrink the height clamp rather than growing
-   it. Small text uses solid mid-tones; the gradient is decoration only. */
+   Lives at the top of .hero-actions-grid now, in place of the old "Watch and
+   read" button — the most prominent slot in the actions area, full width of
+   that column. Proportioned like a live video bar, just taller than its old
+   full-hero-width strip since it no longer has to share room with a portrait
+   beside it. Small text uses solid mid-tones; the gradient is decoration only. */
 .building-banner {
-  grid-column: 1 / -1;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: clamp(.6rem, 1.4cqi, 1.1rem);
-  min-height: clamp(44px, 6vh, 62px);
+  min-height: clamp(52px, 9dvh, 78px);
   padding: .5rem clamp(.75rem, 2cqi, 1.15rem);
   border-radius: 16px;
   border: 1px solid var(--line);
@@ -543,7 +754,17 @@ img { display: block; max-width: 100%; }
   font-size: clamp(0.7rem, 0.6rem + 0.6cqi, 0.86rem);
   font-weight: 700;
   white-space: nowrap;
-  flex-shrink: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* flex-shrink:0 here let the item overflow its own box instead of
+     shrinking, so excess got hard-clipped by the parent (no ellipsis) —
+     ellipsis only ever applies to an element that's actually been
+     constrained smaller than its content. Shrinkable + a floor means it
+     ellipsizes itself gracefully when space is tight, and renders at full
+     natural width whenever there's room (which is the common case now that
+     blurb/channel-label are already gone). */
+  flex-shrink: 1;
+  min-width: 5em;
 }
 .building-banner__blurb {
   font-size: clamp(0.6rem, 0.52rem + 0.5cqi, 0.72rem);
@@ -562,11 +783,10 @@ img { display: block; max-width: 100%; }
   border-left: 1px solid var(--line);
 }
 .building-banner__channel-label {
-  font-size: clamp(0.5rem, 0.42rem + 0.5cqi, 0.6rem);
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  color: var(--muted);
-  white-space: nowrap;
+  /* Least essential text in this narrower (hero-copy-width, not full-hero-width)
+     home — channel name reads fine standalone, drop the label to make room
+     for the title, which is the priority text. */
+  display: none;
 }
 .building-banner__channel-name {
   font-size: clamp(0.62rem, 0.54rem + 0.5cqi, 0.76rem);
@@ -574,6 +794,21 @@ img { display: block; max-width: 100%; }
   font-style: italic;
   white-space: nowrap;
 }
+.building-banner__cta {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: .4rem .75rem;
+  border-radius: 999px;
+  background: var(--accent-gradient);
+  color: white;
+  font-size: clamp(0.58rem, 0.5rem + 0.5cqi, 0.68rem);
+  font-weight: 700;
+  white-space: nowrap;
+  text-decoration: none;
+  text-shadow: 0 1px 6px rgba(0,0,0,.35);
+  transition: filter .18s;
+}
+.building-banner__cta:hover { filter: brightness(1.12); }
 
 /* SECTION HEAD */
 .section-head { display: flex; align-items: center; gap: 1rem; padding: 2rem 0 1rem; }
@@ -596,9 +831,9 @@ img { display: block; max-width: 100%; }
   container-type: size;
   container-name: article;
 }
-.newspaper-page--tall .glass.contact-article,
-.newspaper-page--tall .glass.projects-article,
-.newspaper-page--tall .glass.feature-article-shell {
+.glass.contact-article,
+.glass.projects-article,
+.glass.feature-article-shell {
   display: flex;
   flex-direction: column;
 }
@@ -686,366 +921,163 @@ img { display: block; max-width: 100%; }
 .aside-note { padding: 1rem 1.05rem; border-radius: 18px; border: 1px solid var(--line); background: var(--paper-2); }
 .aside-note p { font-size: clamp(calc(0.72rem + 2px), calc(0.64rem + 2cqw + 0.35cqh), calc(0.96rem + 2.5px)); line-height: 1.65; color: var(--muted); }
 
-/* ── FEATURE ARTICLE VIDEO + TIMELINE ── */
+/* ── FEATURE ARTICLE (video page) ── */
 .feature-article-shell {
   display: flex;
-  width: 100%;
-  min-width: 0;
-  flex: 1 1 0;
-  min-height: 0;
-}
-.feature-article-pad {
-  flex: 1 1 0;
-  width: 100%;
   min-width: 0;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
 }
-.feature-article-head {
-  flex: 0 0 18%;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  gap: .45rem;
-  overflow: hidden;
-  margin: 0;
-  padding-bottom: .35rem;
-  border-bottom: 1px solid var(--line-strong);
-}
-.feature-article-head > .smallcaps {
-  flex: 0 0 auto;
-  overflow: hidden;
-}
-.feature-article-head > div {
-  min-width: 0;
-  min-height: 0;
-  width: 100%;
-}
-.feature-article-head .article-title,
-.feature-article-head .article-deck {
-  margin: 0;
-}
-.feature-article-head .article-deck { max-width: none; }
 .projects-article-head {
   flex: 0 0 15%;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
-  gap: .45rem;
-  overflow: hidden;
   margin: 0;
   padding-bottom: .35rem;
   border-bottom: 1px solid var(--line-strong);
 }
-.projects-article-head > .smallcaps {
-  flex: 0 0 auto;
-  overflow: hidden;
-}
-.projects-article-head > div {
-  min-width: 0;
-  min-height: 0;
-  width: 100%;
-}
-.projects-article-head .article-title,
-.projects-article-head .article-deck {
-  margin: 0;
-}
-.projects-article-head .article-deck { max-width: none; }
-.feature-video-wrap {
-  flex: 1 1 0;
-  min-height: 0;
-  min-width: 0;
-  width: 100%;
+
+/* ── ArticleHead (Feature/Projects/Contact) ──
+   Shared by all three via ArticleHead.jsx. Title/deck use FitBox (real-width
+   per-element fitting) so they always fill the column and use the largest
+   font that fits — `.article-title`/`.article-deck` keep their base
+   clamp-based rule above as the pre-fit fallback and for other consumers
+   (RequestPage, FreelancePage) that don't use FitBox. */
+.article-head-slot {
   display: flex;
   flex-direction: column;
   gap: .4rem;
   overflow: hidden;
-  margin-bottom: .5rem;
 }
-.feature-video-wrap .video-frame {
-  flex: 0 0 auto;
+.article-head-slot > .smallcaps { flex: 0 0 auto; font-size: 15px; }
+.article-head-slot .article-title { letter-spacing: .05rem; }
+.article-head-slot .article-deck { max-width: none; }
+/* ── VIDEO PAGE ── video is the major region, text the minor column ── */
+.feature-article-pad {
+  flex: 1 1 auto;
   width: 100%;
-  max-width: 100%;
-  aspect-ratio: 16 / 9;
-  height: auto;
-}
-.feature-video-caption {
-  flex: 1 1 0;
-  min-height: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  gap: .35rem;
-  margin-top: 0;
-}
-.feature-video-caption > div {
   min-width: 0;
   min-height: 0;
-  width: 100%;
-}
-.feature-video-caption strong,
-.feature-video-caption span,
-.feature-video-caption .feature-body-copy {
-  margin: 0;
-  max-width: none;
-}
-.feature-body-copy {
-  line-height: 1.75;
-  color: var(--muted);
-}
-.timeline-section {
-  margin-top: .5rem;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  container-type: size;
-  container-name: timeline;
-}
-.timeline-section-head { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.2rem; }
-.timeline-section-head .rule { flex: 1; }
-
-/* Stable sub-viewport: measured by ResizeObserver; inner scroll does not change its box */
-.timeline-window {
-  flex: 1;
-  min-height: 0;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  position: relative;
-  contain: layout size style;
-}
-
-/* ── TIMELINE SHARED ── */
-.tl-dot {
-  width: 11px; height: 11px;
-  border-radius: 50%;
-  background: var(--primary);
-  border: 2px solid var(--paper);
-  box-shadow: 0 0 0 2px var(--primary-soft);
-  flex-shrink: 0;
-  position: relative;
-  z-index: 1;
-}
-.checkpoint-card {
-  container-type: size;
-  container-name: checkpoint;
-  border-radius: 18px;
-  border: 2px solid var(--primary-soft);
-  background: var(--paper-2);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-.checkpoint-card-wrap {
-  padding: 8px;
-  height: 100%;
-  width: 100%;
-}
-/* Default = horizontal timeline: portrait card, image = 50% height */
-.checkpoint-img {
-  flex: 0 0 50%;
-  min-height: 0;
-  flex-shrink: 0;
-  background: var(--image-surface);
-  overflow: hidden;
-}
-.checkpoint-img img { width: 100%; height: 100%; object-fit: cover; }
-.checkpoint-content {
-  flex: 1 1 0;
-  min-height: 0;
-  min-width: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  gap: .2rem;
-  padding: .8rem 1rem 1rem;
-}
-.checkpoint-content > div {
-  min-width: 0;
-  min-height: 0;
-  width: 100%;
-}
-.checkpoint-content .smallcaps,
-.checkpoint-content h4,
-.checkpoint-content p {
-  margin: 0;
-}
-.checkpoint-content .smallcaps { display: block; }
-.checkpoint-content h4 {
-  line-height: 1.22;
-  font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: clamp(0.048rem, 0.032rem + 0.28cqw, 0.104rem);
-}
-.checkpoint-content p {
-  line-height: 1.6;
-  color: var(--muted);
-  flex: 1;
-}
-
-/* Vertical timeline: landscape card — image left, 50% width */
-[data-tl-mode="vertical"] .checkpoint-card {
-  flex-direction: row;
+  gap: 1.35rem;
   align-items: stretch;
-  gap: .65rem;
-  flex: 1;
-  min-width: 0;
-  height: 100%;
 }
-[data-tl-mode="vertical"] .checkpoint-img {
-  flex: 0 0 50%;
-  max-width: 50%;
-  min-width: 0;
-}
-[data-tl-mode="vertical"] .checkpoint-content {
-  flex: 1 1 0;
-  min-width: 0;
-  padding: .8rem .9rem .8rem 0;
-}
-
-/* ── TIMELINE SCROLL ── */
-/* scroll-wrap: the overflow container sitting inside timeline-window */
-.timeline-scroll-wrap {
-  flex: 1;
-  min-height: 0;
-  min-width: 0;
-  width: 100%;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-.timeline-scroll-wrap::-webkit-scrollbar { display: none; }
-
-/* scroll-content: inner flex of columns (spine lives inside .timeline-tracks-inner) */
-.timeline-scroll-content {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  flex: 1;
-  min-height: 0;
-  min-width: 0;
-  --tl-spine-thickness: 2px;
-  --tl-spine-inset: 14px;
-}
-
-.timeline-spine-line {
-  position: absolute;
-  pointer-events: none;
-  z-index: 0;
-  background-color: var(--primary-soft);
-  border-radius: 1px;
-}
-
-.timeline-tracks-inner {
-  display: flex;
-  position: relative;
-  z-index: 1;
-  flex: 1;
-  min-height: 0;
-  min-width: 0;
-}
-
-.timeline-track-col {
-  flex: 0 0 auto;
-  display: flex;
-}
-
-/* Dot-only spine strip — drag handle */
-.tl-segment {
+.feature-video-major {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  cursor: grab;
-  touch-action: none;
-  user-select: none;
+}
+.feature-video-major .video-frame {
   width: 100%;
+  max-height: 100%;
+  aspect-ratio: 16 / 9;
 }
-.tl-segment:active,
-.timeline-scroll-wrap.is-dragging .tl-segment { cursor: grabbing; }
-
-/* ── Horizontal mode ── */
-[data-tl-mode="horizontal"] .timeline-scroll-wrap {
-  overflow-x: auto;
-  overflow-y: hidden;
+.feature-text-minor {
   display: flex;
-}
-[data-tl-mode="horizontal"] .timeline-scroll-content {
   flex-direction: column;
-  height: 100%;
-  width: max-content;
-  min-width: 100%;
-  /* scroll-wrap is flex; flex:1 was stretching width to viewport — spine ended mid-row */
-  flex: 0 0 auto;
-  align-self: stretch;
+  gap: .5rem;
+  padding-left: 1.35rem;
+  border-left: 1px solid var(--line-strong);
 }
-[data-tl-mode="horizontal"] .timeline-tracks-inner {
-  flex-direction: row;
-  align-items: stretch;
-  min-width: max-content;
-  height: 100%;
+.feature-text-minor .rule { flex: 0 0 auto; }
+.feature-body-copy { line-height: 1.6; color: var(--muted); }
+
+/* ── TIMELINE PAGE — horizontal reel ──
+   Padding on left/right/bottom; the spine strip on top is exactly 2x the
+   article padding tall, per the layout spec. Cards below fill what's left,
+   one at a time. */
+.timeline-article {
+  --tl-pad: 1.35rem;
+  display: flex;
+  flex-direction: column;
 }
-[data-tl-mode="horizontal"] .timeline-spine-line {
+.timeline-article-pad {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--tl-pad) var(--tl-pad);
+}
+.tl-spine {
+  flex: 0 0 calc(2 * var(--tl-pad));
+  height: calc(2 * var(--tl-pad));
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.tl-spine-line {
+  position: absolute;
   left: 0;
   right: 0;
-  top: calc(var(--tl-spine-inset) - var(--tl-spine-thickness) / 2);
-  height: var(--tl-spine-thickness);
+  height: 2px;
+  background: var(--line-strong);
 }
-[data-tl-mode="horizontal"] .timeline-track-col {
-  flex-direction: column;
-  height: 100%;
-  width: auto;
-  aspect-ratio: var(--tl-secondary, 0.65) / 1;
-}
-[data-tl-mode="horizontal"] .tl-segment {
-  height: 28px;
-  margin-bottom: .45rem;
-}
-[data-tl-mode="horizontal"] .checkpoint-card {
-  flex: 1;
-  min-height: 0;
+.tl-spine-nodes {
+  position: relative;
+  z-index: 1;
   width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-[data-tl-mode="horizontal"] .checkpoint-img {
-  max-width: none;
-  flex: 0 0 50%;
+.tl-node {
+  width: 11px;
+  height: 11px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 2px solid var(--primary-soft);
+  cursor: pointer;
+  transition: background .18s, border-color .18s, transform .18s;
 }
+.tl-node:hover { transform: scale(1.25); }
+.tl-node--active {
+  background: var(--primary);
+  border-color: var(--primary);
+  transform: scale(1.3);
+}
+.tl-node:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
 
-/* ── Vertical mode ── */
-[data-tl-mode="vertical"] .timeline-scroll-wrap {
-  overflow-x: hidden;
-  overflow-y: auto;
+/* The reel itself: one card per "page", snapped. */
+.tl-reel {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
 }
-[data-tl-mode="vertical"] .timeline-scroll-content {
-  flex-direction: column;
-  min-height: max-content;
+.tl-reel::-webkit-scrollbar { display: none; }
+.tl-card {
+  flex: 0 0 100%;
   width: 100%;
-}
-[data-tl-mode="vertical"] .timeline-tracks-inner {
-  flex-direction: column;
-  width: 100%;
-  min-height: max-content;
-}
-[data-tl-mode="vertical"] .timeline-spine-line {
-  left: calc(var(--tl-spine-inset) - var(--tl-spine-thickness) / 2);
-  width: var(--tl-spine-thickness);
-  top: 0;
-  bottom: 0;
-}
-[data-tl-mode="vertical"] .timeline-track-col {
-  flex-direction: row;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 1 / var(--tl-secondary, 0.65);
-}
-[data-tl-mode="vertical"] .tl-segment {
-  width: 28px;
   height: 100%;
-  margin-bottom: 0;
-  margin-right: .45rem;
+  min-width: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  gap: 1.2rem;
+  align-items: stretch;
+}
+.tl-card-visual {
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: var(--image-surface);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tl-card-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.tl-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  padding-left: 1.2rem;
+  border-left: 1px solid var(--line-strong);
 }
 
 /* ── PROJECTS TREEMAP ── */
@@ -1083,7 +1115,10 @@ img { display: block; max-width: 100%; }
   will-change: transform;
   display: flex;
   flex-direction: column;
-  padding: 12px;
+  /* Padding/fonts below come from src/styles/tileMetrics.js via
+     applyTileMetricsCssVars() — the same numbers measureProjectFitPretext.js
+     uses to predict fit, so the two can't drift apart. */
+  padding: var(--tile-pad, 12px);
   /* Tile-aware typography (checkpoint-style ranges): cq units track card size */
   container-type: size;
   container-name: project-tile;
@@ -1094,7 +1129,7 @@ img { display: block; max-width: 100%; }
   box-shadow: var(--shadow);
 }
 .projects-item--last {
-  padding: 8px;
+  padding: var(--tile-pad-last, 8px);
 }
 .lead-project {
   padding: 1.15rem;
@@ -1115,7 +1150,7 @@ img { display: block; max-width: 100%; }
 }
 .project-visual {
   /* 40% of main axis — column: height; row: width (see class rules) */
-  flex: 0 0 40%;
+  flex: 0 0 var(--tile-image-fraction, 40%);
   border-radius: 14px;
   border: 1px solid var(--line);
   background: #fff;
@@ -1141,7 +1176,7 @@ img { display: block; max-width: 100%; }
   flex: 1 1 0;
   display: flex;
   flex-direction: column;
-  gap: .3rem;
+  gap: var(--tile-content-gap, .3rem);
   min-height: 0;
   overflow: hidden;
 }
@@ -1170,21 +1205,44 @@ img { display: block; max-width: 100%; }
 /* Title/body scale with tile (~20% smaller caps vs prior project clamp) */
 .project-title {
   font-family: var(--font-display);
-  font-size: clamp(0.8rem, 0.44rem + 2.4cqw + 1cqh, 1.6rem);
+  font-size: var(--tile-title-font, clamp(0.8rem, 0.44rem + 2.4cqw + 1cqh, 1.6rem));
   line-height: 0.95;
-  letter-spacing: clamp(0.048rem, 0.032rem + 0.28cqw, 0.104rem);
+  letter-spacing: var(--tile-title-letter, clamp(0.048rem, 0.032rem + 0.28cqw, 0.104rem));
   font-weight: 700;
   margin: 0;
 }
 .projects-item--last .project-title {
-  font-size: clamp(0.736rem, 0.36rem + 2cqw + 0.8cqh, 1.2rem);
+  font-size: var(--tile-title-last-font, clamp(0.736rem, 0.36rem + 2cqw + 0.8cqh, 1.2rem));
 }
 .project-body {
   /* font-size driven by FitBox inline style; CSS value is a fallback only */
-  font-size: clamp(0.704rem, 0.4rem + 1.76cqw + 0.72cqh, calc(1.2rem + 2px));
+  font-size: var(--tile-body-font, clamp(0.704rem, 0.4rem + 1.76cqw + 0.72cqh, calc(1.2rem + 2px)));
   line-height: 1.6;
   color: var(--muted);
   margin: 0;
+}
+.project-bullets {
+  font-family: var(--font-tech);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .3em;
+}
+.project-bullets li {
+  position: relative;
+  padding-left: 1em;
+}
+.project-bullets li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: .55em;
+  width: .34em;
+  height: .34em;
+  border-radius: 50%;
+  background: var(--primary);
 }
 .mini-visual {
   height: 120px;
@@ -1202,7 +1260,7 @@ img { display: block; max-width: 100%; }
   border-radius: 999px;
   background: var(--accent);
   color: var(--primary-soft);
-  font-size: clamp(0.52rem, 0.4rem + 0.88cqw, 0.616rem);
+  font-size: var(--tile-tag-font, clamp(0.52rem, 0.4rem + 0.88cqw, 0.616rem));
   font-weight: 700;
 }
 
@@ -1337,34 +1395,22 @@ img { display: block; max-width: 100%; }
 .contact-welcome {
   flex: 0 0 20%;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
-  gap: .45rem;
-  overflow: hidden;
   padding-bottom: .35rem;
   margin-bottom: .5rem;
   border-bottom: 1px solid var(--line-strong);
 }
-.contact-welcome > .smallcaps {
-  flex: 0 0 auto;
-  overflow: hidden;
-}
-.contact-welcome > div {
-  min-width: 0;
+/* Contact fits one rect: links take the major region, the CV preview the
+   minor one beside them. */
+.contact-body {
+  flex: 1 1 0;
   min-height: 0;
-  width: 100%;
+  gap: .85rem;
 }
-.contact-welcome .article-title,
-.contact-welcome .article-deck {
-  margin: 0;
-}
-.contact-welcome .article-deck { max-width: none; }
 .profile-cards {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 1fr 1fr 1fr 1fr 2fr;
+  grid-template-rows: repeat(4, 1fr);
   gap: .85rem;
-  flex: 1 1 0;
   min-height: 0;
 }
 .profile-card {
@@ -1709,35 +1755,59 @@ img { display: block; max-width: 100%; }
 }
 
 /* FOOTER */
-.footer { padding: 1.15rem 0 2.5rem; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; color: var(--muted); font-size: clamp(calc(0.656rem + 2px), calc(0.58rem + 0.35cqi), calc(0.82rem + 2.5px)); }
+/* Its own snap position — under `mandatory` an element with no snap area of
+   its own can end up unreachable, parked between two page snap points. */
+.footer { scroll-snap-align: start; padding: 1.15rem 0 2.5rem; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; color: var(--muted); font-size: clamp(calc(0.656rem + 2px), calc(0.58rem + 0.35cqi), calc(0.82rem + 2.5px)); }
 
 /* RESPONSIVE — portrait = mobile (matches the vh/aspect-ratio design philosophy) */
 
 /* Primary mobile trigger: any viewport taller than it is wide */
-@media (max-aspect-ratio: 1/1) {
-  /* ── Hero: strip landscape locks, stack panels, each gets 50vh ── */
-  #hero {
-    aspect-ratio: unset;
-    height: auto;
-    width: 100%;
-    max-width: 100%;
-  }
-  .hero-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    padding-top: 1rem;
-  }
-  .hero-copy.glass,
-  .hero-side.glass {
-    min-height: 50vh;
-    height: auto;
-  }
-  .hero-copy h2  { max-width: none; }
+@media (max-aspect-ratio: 4/3) {
+  /* ── Hero: stack the two panels; the rect (which fills the stage in
+     portrait) supplies the height, so the panels just split it. ── */
+  .hero-grid { gap: 1rem; }
+  /* Portrait shows the portrait first — it's the more immediate "who is
+     this" signal at a glance; front-page text follows. The snap point
+     (.newspaper-page's own top edge) doesn't move, so it naturally aligns
+     to whichever panel is visually first. */
+  .hero-side { order: 1; }
+  .hero-copy { order: 2; }
+  /* Desktop caps portrait at the phi minor so the quote's bottom edge lines
+     up with the building-banner's — mobile's tighter budget needs portrait
+     absorbing all remaining space instead. */
+  .portrait { flex: 1 1 0; }
+  /* Narrow portrait: status+title+channel+CTA together overflow the banner
+     width even with blurb/channel-label already gone. Channel credit is the
+     next thing to drop — status, title (the project name), and the CTA are
+     the three that matter here. */
+  .building-banner__channel { display: none; }
 
-  /* Narrow screens: the channel credit is the first thing to go — the blurb
-     carries the actual information. */
+  /* Portrait hero-copy column: title needs far less room than the actions
+     stack (banner + stack chips), so the split flips from desktop's 60/40 in
+     favour of actions. Banner's min-height also comes down — 9dvh was tuned
+     for the full desktop panel, not a halved mobile one. */
+  .hero-copy-text  { flex: 0 0 50%; }
+  .hero-actions-grid {
+    flex: 0 0 50%;
+    gap: .5rem;
+  }
+  .building-banner { min-height: clamp(40px, 6.5dvh, 56px); }
+
+  .hero-copy-text { gap: .35rem; }
+  .hero-copy-text > .smallcaps { font-size: 12px; }
+
+  /* Portrait stack/quote design canvases (see HERO_*_DESIGN_PORTRAIT in
+     Hero.jsx) — authored smaller since the panel is a fraction of the
+     desktop width. */
+  .hero-stack-canvas { gap: 8px; }
+  .stack-chip { padding: .4rem .75rem; font-size: 14px; }
+  .stack-chip-dot { width: 10px; height: 10px; }
+  .stack-chip-dot::after { width: 5px; height: 5px; }
+  .pull-quote-canvas { font-size: 13px; line-height: 1.4; }
+
+  /* Narrow screens: blurb is the next thing to go — channel-label is already
+     hidden unconditionally (see .building-banner__channel-label above). */
   .building-banner__blurb  { display: none; }
-  .building-banner__channel-label { display: none; }
 
   /* ── Masthead: collapse side columns, keep title centred ── */
   .masthead-top    { grid-template-columns: 0 1fr 0; }
@@ -1758,11 +1828,18 @@ img { display: block; max-width: 100%; }
   }
   .nav-links a { white-space: nowrap; }
 
-  /* ── Tall glass sections (feature / projects / contact): keep page shell ~desktop scale — 100vh, max 95vw ── */
-  .newspaper-page--tall .glass {
-    aspect-ratio: 6.33/9;
-    height: 100vh;
-    min-height: 100vh;
+  /* ── Portrait opts out of the golden rect and fills the stage — honoring
+     phi:1 on a 9:19.5 phone would waste ~40% of the viewport. The rect's
+     *subdivisions* still apply; only the outer box changes. ── */
+  .golden-rect {
+    width: min(100vw - 2 * var(--stage-gutter), var(--stage-max-w));
+    height: calc(var(--stage-h) - 2 * var(--stage-gutter));
+  }
+  /* Stacked, not side-by-side: a phi split across a ~310px column gives a
+     minor region too narrow to hold anything. */
+  [data-viewclass="portrait"] .golden-split { flex-direction: column; }
+
+  .glass {
     width: 100%;
     max-width: 100%;
     margin: 0 auto;
@@ -1770,33 +1847,33 @@ img { display: block; max-width: 100%; }
     flex-direction: column;
   }
 
-  .newspaper-page--tall .glass .article-pad--contact,
-  .newspaper-page--tall .glass .article-pad--projects,
-  .newspaper-page--tall .glass .feature-article-pad {
+  .glass .article-pad--contact,
+  .glass .article-pad--projects,
+  .glass .feature-article-pad {
     min-height: 0;
   }
 
   /* ── Section head (eyebrow + title above each card): cap ~10% viewport — same order as 10% of 100vh glass ── */
-  .newspaper-page--tall .section-head {
-    max-height: 10vh;
+  .section-head {
+    max-height: 10dvh;
     min-height: 0;
     padding: 0.35rem 0 0.3rem;
     overflow: hidden;
     align-items: center;
   }
-  .newspaper-page--tall .section-head h3 {
+  .section-head h3 {
     white-space: normal;
     font-size: clamp(0.78rem, 2.8cqi + 0.4rem, 1.05rem);
     line-height: 1.12;
     margin: 0;
   }
-  .newspaper-page--tall .section-head .smallcaps {
+  .section-head .smallcaps {
     font-size: clamp(0.4rem, 0.9cqi, 0.52rem);
   }
 
   /* ── In-card article heads: max 10% of glass (= 10vh when glass is 100vh); scroll if needed ── */
-  .newspaper-page--tall .glass .article-head {
-    max-height: 10vh;
+  .glass .article-head {
+    max-height: 10dvh;
     min-height: 0;
     overflow-x: hidden;
     overflow-y: auto;
@@ -1806,74 +1883,47 @@ img { display: block; max-width: 100%; }
     margin-bottom: 0.5rem;
     flex-shrink: 0;
   }
-  .newspaper-page--tall .glass .feature-article-head {
-    flex: 0 0 18%;
-    max-height: 18%;
-    min-height: 0;
-    gap: .35rem;
-    overflow: hidden;
-    margin-bottom: 0.45rem;
-    padding-bottom: 0.35rem;
+  .glass .feature-article-head {
+    flex: 0 0 14%;
   }
-  .newspaper-page--tall .glass .feature-video-wrap {
-    flex: 1 1 0;
+  /* Timeline gets the bigger share of the video/timeline split here — video
+     height is capped by its own 16:9 aspect (doesn't need much of a narrow
+     portrait column's width), so it doesn't need equal footing with the
+     timeline for the window to reach the vertical-mode aspect ratio
+     (useTimelineLayout.js, ratio > 1.12). */
+  .glass .feature-video-wrap {
+    flex: 0.8 1 0;
     min-height: 0;
     width: 100%;
     margin-bottom: 0.45rem;
   }
-  .newspaper-page--tall .glass .feature-video-wrap .video-frame {
+  .glass .feature-video-wrap .video-frame {
     flex: 0 0 auto;
     width: 100%;
     aspect-ratio: 16 / 9;
     height: auto;
   }
-  .newspaper-page--tall .glass .contact-welcome {
-    flex: 0 0 20%;
-    max-height: 20%;
-    min-height: 0;
-    gap: .35rem;
-    overflow: hidden;
-    margin-bottom: 0.45rem;
-    padding-bottom: 0.35rem;
+  .glass .timeline-section {
+    flex: 1.4 1 0;
   }
-  .newspaper-page--tall .glass .projects-article-head {
-    flex: 0 0 15%;
-    max-height: 15%;
-    min-height: 0;
-    gap: .35rem;
-    overflow: hidden;
-    margin-bottom: 0.45rem;
-    padding-bottom: 0.35rem;
-  }
-  .newspaper-page--tall .glass .article-title {
-    font-size: clamp(0.9rem, 3.5cqi + 1.8cqh, 1.35rem);
-    line-height: 1.08;
-    margin: 0.08rem 0 0.28rem;
-  }
-  .newspaper-page--tall .glass .contact-welcome .article-title {
+  .glass .feature-video-caption strong,
+  .glass .feature-video-caption span,
+  .glass .feature-video-caption .feature-body-copy,
+  .glass .checkpoint-content .smallcaps,
+  .glass .checkpoint-content h4,
+  .glass .checkpoint-content p {
     margin: 0;
   }
-  .newspaper-page--tall .glass .feature-article-head .article-title,
-  .newspaper-page--tall .glass .feature-article-head .article-deck,
-  .newspaper-page--tall .glass .projects-article-head .article-title,
-  .newspaper-page--tall .glass .projects-article-head .article-deck,
-  .newspaper-page--tall .glass .feature-video-caption strong,
-  .newspaper-page--tall .glass .feature-video-caption span,
-  .newspaper-page--tall .glass .feature-video-caption .feature-body-copy,
-  .newspaper-page--tall .glass .checkpoint-content .smallcaps,
-  .newspaper-page--tall .glass .checkpoint-content h4,
-  .newspaper-page--tall .glass .checkpoint-content p {
-    margin: 0;
-  }
-  .newspaper-page--tall .glass .article-deck {
-    font-size: clamp(0.6rem, 2.4cqi + 1cqh, 0.78rem);
-    line-height: 1.42;
-    margin: 0;
-  }
-  .newspaper-page--tall .glass .article-head .smallcaps {
+  .glass .article-head .smallcaps {
     font-size: clamp(0.42rem, 1.4cqi, 0.52rem);
     margin-bottom: 0.12rem;
   }
+
+  /* Portrait ArticleHead (Feature/Projects/Contact) — FitBox picks the real
+     font size per element; just tighten the gap/eyebrow for the narrower
+     column. */
+  .article-head-slot { gap: .3rem; }
+  .article-head-slot > .smallcaps { font-size: 10px; }
 
   /* ── Contact cards ── */
   .profile-card      { min-height: 0; gap: 1rem; padding: 0.9rem 1rem; }

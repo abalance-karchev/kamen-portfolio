@@ -7,6 +7,8 @@ import FreelancePage from './pages/FreelancePage'
 import RequestPage from './pages/RequestPage'
 import DocumentRoute from './pages/DocumentRoute'
 import { CONTENT } from './data/content'
+import { useSlotMetrics } from './hooks/useSlotMetrics'
+import { useScrollTuning } from './hooks/useScrollTuning'
 
 const DEFAULT_LANGUAGE = 'en'
 const LANGUAGE_STORAGE_KEY = 'kamen-portfolio-language'
@@ -17,6 +19,8 @@ function getInitialLanguage() {
 }
 
 export default function App() {
+  useSlotMetrics()
+  useScrollTuning()
   const [theme, setTheme] = useState(
     () => window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   )

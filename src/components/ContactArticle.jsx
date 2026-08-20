@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AnimatePresence, motion as Motion } from 'motion/react'
 import FitBox from './FitBox'
+import ArticleHead from './ArticleHead'
 
 /* Must match .page width in public/cv-preview.html (210mm ≈ 794px) */
 const CV_NATURAL_W = 794
@@ -88,7 +89,7 @@ const cardVariants = {
   hidden: { opacity: 0, y: 20 },
   show: (i) => ({
     opacity: 1, y: 0,
-    transition: { duration: .55, ease: [.16, 1, .3, 1], delay: i * 0.08 },
+    transition: { duration: .73, ease: [.16, 1, .3, 1], delay: i * 0.08 },
   }),
 }
 
@@ -257,40 +258,22 @@ export default function ContactArticle({ copy }) {
 
   return (
     <Motion.section
-      className="glass contact-article"
+      className="glass contact-article golden-rect"
       initial={{ opacity: 0, y: 36 }}
       whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: .7, ease: [.16, 1, .3, 1] }}
+      transition={{ duration: .93, ease: [.16, 1, .3, 1] }}
       viewport={{ once: true, amount: .1 }}
     >
       <div className="article-pad article-pad--contact">
-        <div className="contact-welcome">
-          <span className="smallcaps">{copy.eyebrow}</span>
+        <ArticleHead
+          eyebrow={copy.eyebrow}
+          title={copy.title}
+          deck={copy.deck}
+          headClassName="contact-welcome"
+        />
 
-          <FitBox
-            element="h3"
-            maxFontSize={66}
-            scale={0.82}
-            containerStyle={{ flex: '1.5 1 0', minHeight: 0, overflow: 'hidden' }}
-            textStyle={{ lineHeight: 1.05, letterSpacing: 'clamp(0.048rem, 0.034rem + 0.22cqw, 0.104rem)', fontWeight: 700, margin: 0, fontFamily: 'var(--font-display)' }}
-            className="article-title"
-          >
-            {copy.title}
-          </FitBox>
-
-          <FitBox
-            element="p"
-            maxFontSize={18}
-            scale={1}
-            containerStyle={{ flex: '1 1 0', minHeight: 0, overflow: 'hidden' }}
-            textStyle={{ lineHeight: 1.45, color: 'var(--muted)', margin: 0 }}
-            className="article-deck"
-          >
-            {copy.deck}
-          </FitBox>
-        </div>
-
-        <div className="profile-cards">
+        <div className="contact-body golden-split">
+        <div className="major profile-cards">
           {copy.items.map((item, i) => {
             if (item.brand === 'certificates' && copy.certificates) {
               return (
@@ -328,8 +311,9 @@ export default function ContactArticle({ copy }) {
               </Motion.a>
             )
           })}
+          </div>
 
-          <div className="cv-preview-pane-wrap">
+          <div className="minor cv-preview-pane-wrap">
             <div className="cv-preview-pane-container">
               <Motion.a
                 href={copy.cvHref}

@@ -11,9 +11,10 @@ export default function ProjectCard({
   image,
   title,
   body,
+  bullets,
   tags,
   className = '',
-  bodyMaxFontSize = 21,
+  bodyMaxFontSize = 26,
   children,
   ...motionProps
 }) {
@@ -33,14 +34,19 @@ export default function ProjectCard({
       <div className="project-content">
         <h4 className="project-title">{title}</h4>
 
+        {/* Bullets over prose: fewer words at a larger size get read, a
+            dense paragraph in a treemap tile does not. Falls back to `body`
+            for any project that has no bullets authored yet. */}
         <FitBox
-          element="p"
+          element={bullets?.length ? 'ul' : 'p'}
           maxFontSize={bodyMaxFontSize}
           containerStyle={{ flex: '1 1 0', minHeight: 0, overflow: 'hidden' }}
-          textStyle={{ lineHeight: 1.6, color: 'var(--muted)', margin: 0 }}
-          className="project-body"
+          textStyle={{ lineHeight: 1.45, color: 'var(--muted)', margin: 0 }}
+          className={bullets?.length ? 'project-bullets' : 'project-body'}
         >
-          {body}
+          {bullets?.length
+            ? bullets.map(b => <li key={b}>{b}</li>)
+            : body}
         </FitBox>
 
         {tags?.length > 0 && (

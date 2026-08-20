@@ -2,8 +2,11 @@ import { useLayoutEffect, useRef, useState } from 'react'
 import { motion as Motion } from 'motion/react'
 import { getProjectCards } from '../utils/v3'
 import { measureProjectFitPretext } from '../utils/measureProjectFitPretext'
-import FitBox from './FitBox'
+import { applyTileMetricsCssVars } from '../styles/tileMetrics'
+import ArticleHead from './ArticleHead'
 import ProjectCard from './ProjectCard'
+
+applyTileMetricsCssVars()
 
 /** @param {{ id: string, startx: number, starty: number, width: number, height: number }[]} cards */
 function cardsToRects(cards) {
@@ -68,36 +71,19 @@ export default function ProjectsArticle({ copy }) {
 
   return (
     <Motion.section
-      className="glass projects-article"
+      className="glass projects-article golden-rect"
       initial={{ opacity: 0, y: 36 }}
       whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: .7, ease: [.16, 1, .3, 1] }}
+      transition={{ duration: .93, ease: [.16, 1, .3, 1] }}
       viewport={{ once: true, amount: .1 }}
     >
       <div className="article-pad article-pad--projects">
-        <div className="projects-article-head">
-          <span className="smallcaps">{copy.eyebrow}</span>
-          <FitBox
-            element="h3"
-            maxFontSize={66}
-            scale={0.82}
-            containerStyle={{ flex: '1.5 1 0', minHeight: 0, overflow: 'hidden' }}
-            textStyle={{ lineHeight: 1.05, letterSpacing: 'clamp(0.048rem, 0.034rem + 0.22cqw, 0.104rem)', fontWeight: 700, margin: 0, fontFamily: 'var(--font-display)' }}
-            className="article-title"
-          >
-            {copy.title}
-          </FitBox>
-          <FitBox
-            element="p"
-            maxFontSize={18}
-            scale={0.82}
-            containerStyle={{ flex: '1 1 0', minHeight: 0, overflow: 'hidden' }}
-            textStyle={{ lineHeight: 1.45, color: 'var(--muted)', margin: 0 }}
-            className="article-deck"
-          >
-            {copy.deck}
-          </FitBox>
-        </div>
+        <ArticleHead
+          eyebrow={copy.eyebrow}
+          title={copy.title}
+          deck={copy.deck}
+          headClassName="projects-article-head"
+        />
 
         {/* projects-layout fills remaining flex space (flex: 1 1 0 in CSS) */}
         <div ref={containerRef} className="projects-layout">
@@ -114,6 +100,7 @@ export default function ProjectsArticle({ copy }) {
             return (
               <div
                 key={p.id}
+                id={`project-${p.id}`}
                 className="projects-layout-cell"
                 style={{
                   position: 'absolute',
@@ -132,6 +119,7 @@ export default function ProjectsArticle({ copy }) {
                   image={p.image}
                   title={p.title}
                   body={p.body}
+                  bullets={p.bullets}
                   tags={p.tags}
                 />
               </div>

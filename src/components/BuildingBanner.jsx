@@ -5,7 +5,7 @@ import { motion as Motion, useReducedMotion } from 'motion/react'
 // The "live" styling is a visual metaphor for active work. It must never read
 // as a claim that a stream is running: no viewer count, no "LIVE NOW", no
 // launch date. Everything it states is verifiable.
-export default function BuildingBanner({ copy }) {
+export default function BuildingBanner({ copy, ctaHref }) {
   const reduceMotion = useReducedMotion()
   if (!copy) return null
 
@@ -23,7 +23,7 @@ export default function BuildingBanner({ copy }) {
       initial={{ opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: .4 }}
-      transition={{ duration: .5, delay: .2, ease: [.16, 1, .3, 1] }}
+      transition={{ duration: .67, delay: .2, ease: [.16, 1, .3, 1] }}
     >
       <span className="building-banner__indicator" aria-hidden="true">
         <Motion.span className="building-banner__dot" {...pulse} />
@@ -40,6 +40,12 @@ export default function BuildingBanner({ copy }) {
         <span className="building-banner__channel-label">{copy.channelLabel}</span>
         <em className="building-banner__channel-name">{copy.channel}</em>
       </span>
+
+      {ctaHref && copy.cta && (
+        <a className="building-banner__cta" href={ctaHref}>
+          {copy.cta}
+        </a>
+      )}
     </Motion.div>
   )
 }

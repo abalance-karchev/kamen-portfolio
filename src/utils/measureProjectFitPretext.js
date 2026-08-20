@@ -1,11 +1,11 @@
 /**
  * measureProjectFitPretext — tile content visibility using @chenglou/pretext.
  *
- * Same outer contract as measureProjectFit.js (input/output). Constants and
- * inner geometry must stay aligned with measureProjectFit.js and global.css
- * (.projects-item, .project-visual, .project-title, .project-body, .tag).
- *
- * Title/body font sizes mirror global.css (container cqw/cqh clamps — checkpoint-style caps).
+ * Same outer contract as measureProjectFit.js (input/output). Geometry
+ * constants come from src/styles/tileMetrics.js — the single source of
+ * truth shared with global.css's `.projects-item` rules (via
+ * applyTileMetricsCssVars), so this measurer can't drift out of sync with
+ * the real tiles the way the old hand-duplicated constants did.
  *
  * Rules:
  *   - Title rejected if its laid-out height is strictly greater than 65% of
@@ -20,88 +20,17 @@
  */
 
 import { prepare, layout } from '@chenglou/pretext'
+import { TILE_METRICS, clampFormulaPx, TILE_METRICS_REM } from '../styles/tileMetrics'
 
-// ── Keep in sync with measureProjectFit.js + global.css ─────────────────────
-const ITEM_PADDING      = 12
-const ITEM_PADDING_LAST = 8 // .projects-item--last
-const ITEM_SCALE        = 0.975
-const IMAGE_FRACTION    = 0.40
-const IMAGE_MARGIN_PX   = 16
-
-/** Max share of image band height the title may occupy (strict > fails). */
-const TITLE_MAX_OF_IMAGE = 0.65
-
-function clamp(n, lo, hi) {
-  return Math.min(hi, Math.max(lo, n))
-}
+const REM = TILE_METRICS_REM
 
 function padPx(isLast) {
-  return isLast ? ITEM_PADDING_LAST : ITEM_PADDING
-}
-
-/**
- * Mirrors scaled CSS (~20% smaller than original project clamps):
- *   clamp(0.8rem, 0.44rem + 2.4cqw + 1cqh, 1.6rem)
- *   .projects-item--last: clamp(0.736rem, 0.36rem + 2cqw + 0.8cqh, 1.2rem)
- */
-function titleFontPxFromTile(innerW, innerH, isLast) {
-  const rem = 16
-  const cqw = innerW / 100
-  const cqh = innerH / 100
-  if (isLast) {
-    const pref = 0.36 * rem + 2 * cqw + 0.8 * cqh
-    return clamp(pref, 0.736 * rem, 1.2 * rem)
-  }
-  const pref = 0.44 * rem + 2.4 * cqw + 1 * cqh
-  return clamp(pref, 0.8 * rem, 1.6 * rem)
-}
-
-/** Mirrors: clamp(0.048rem, 0.032rem + 0.28cqw, 0.104rem) */
-function titleLetterSpacingPx(innerW) {
-  const rem = 16
-  return clamp(0.048 * rem, 0.032 * rem + 0.0028 * innerW, 0.104 * rem)
-}
-
-/** Mirrors: clamp(0.28rem, 0.16rem + 0.48cqh, 0.44rem) */
-function titleMarginBottomPx(innerH) {
-  const rem = 16
-  const cqh = innerH / 100
-  return clamp(0.28 * rem, 0.16 * rem + 0.48 * cqh, 0.44 * rem)
-}
-
-/**
- * Mirrors: clamp(0.704rem, 0.4rem + 1.76cqw + 0.72cqh, calc(1.2rem + 2px))
- */
-function bodyFontPxFromTile(innerW, innerH) {
-  const rem = 16
-  const cqw = innerW / 100
-  const cqh = innerH / 100
-  const maxPx = 1.2 * rem + 2
-  const pref = 0.4 * rem + 1.76 * cqw + 0.72 * cqh
-  return clamp(pref, 0.704 * rem, maxPx)
-}
-
-/** Mirrors: clamp(0.48rem, 0.32rem + 0.64cqh, 0.72rem) */
-function bodyMarginBottomPx(innerH) {
-  const rem = 16
-  const cqh = innerH / 100
-  return clamp(0.48 * rem, 0.32 * rem + 0.64 * cqh, 0.72 * rem)
-}
-
-/**
- * Mirrors: clamp(0.52rem, 0.4rem + 0.88cqw, 0.616rem)
- */
-function tagFontPxFromTile(innerW) {
-  const rem = 16
-  const cqw = innerW / 100
-  const pref = 0.4 * rem + 0.88 * cqw
-  return clamp(pref, 0.52 * rem, 0.616 * rem)
+  return isLast ? TILE_METRICS.itemPaddingLast : TILE_METRICS.itemPadding
 }
 
 /**
  * @param {string} text
  * @param {number} innerW
- * @param {number} innerH
  * @param {number} bodyFontPx
  */
 function bodyHeight(text, innerW, bodyFontPx) {
@@ -120,7 +49,7 @@ function bodyHeight(text, innerW, bodyFontPx) {
 function tagsBlockHeight(tags, innerW) {
   if (!tags?.length) return 0
   const line = tags.join('  ')
-  const tPx = tagFontPxFromTile(innerW)
+  const tPx = clampFormulaPx(TILE_METRICS.tag, innerW, 0)
   const prepared = prepare(line, `700 ${tPx}px "Inter", sans-serif`)
   const lh = Math.max(10.4, tPx * 1.2)
   const { height } = layout(prepared, innerW, lh)
@@ -130,8 +59,8 @@ function tagsBlockHeight(tags, innerW) {
 export function measureProjectFitPretext(project, rect, options = {}) {
   const { isLast = false } = options
 
-  const itemW  = rect.w * ITEM_SCALE
-  const itemH  = rect.h * ITEM_SCALE
+  const itemW  = rect.w * TILE_METRICS.itemScale
+  const itemH  = rect.h * TILE_METRICS.itemScale
   const pad    = padPx(isLast)
   const innerW = itemW - pad * 2
   const innerH = itemH - pad * 2
@@ -140,16 +69,17 @@ export function measureProjectFitPretext(project, rect, options = {}) {
     return { titleFits: false, showBody: false, showTags: false }
   }
 
-  const imageH    = itemH * IMAGE_FRACTION
-  const textAreaH = innerH - imageH - IMAGE_MARGIN_PX
+  const imageH    = itemH * TILE_METRICS.imageFraction
+  const textAreaH = innerH - imageH - TILE_METRICS.imageMarginPx
 
   if (textAreaH < 20) {
     return { titleFits: false, showBody: false, showTags: false }
   }
 
-  const tPx            = titleFontPxFromTile(innerW, innerH, isLast)
-  const titleLetterPx  = titleLetterSpacingPx(innerW)
-  const titleMarginPx  = titleMarginBottomPx(innerH)
+  const gapPx = TILE_METRICS.contentGap * REM
+
+  const tPx           = clampFormulaPx(isLast ? TILE_METRICS.titleLast : TILE_METRICS.title, innerW, innerH)
+  const titleLetterPx = clampFormulaPx(TILE_METRICS.titleLetter, innerW, 0)
 
   const title = String(project.title ?? '')
   const titlePrepared = prepare(
@@ -160,22 +90,21 @@ export function measureProjectFitPretext(project, rect, options = {}) {
   const titleLH = tPx * 0.95
   const { height: titleH } = layout(titlePrepared, innerW, titleLH)
 
-  if (titleH > TITLE_MAX_OF_IMAGE * imageH) {
+  if (titleH > TILE_METRICS.titleMaxOfImage * imageH) {
     return { titleFits: false, showBody: false, showTags: false }
   }
 
-  const titleBlock = titleH + titleMarginPx
+  const titleBlock = titleH + gapPx
   if (titleBlock > textAreaH) {
     return { titleFits: false, showBody: false, showTags: false }
   }
 
-  const bodyFontPx = bodyFontPxFromTile(innerW, innerH)
+  const bodyFontPx = clampFormulaPx(TILE_METRICS.body, innerW, innerH)
   const bodyH      = bodyHeight(project.body, innerW, bodyFontPx)
-  const bodyMarginPx = bodyMarginBottomPx(innerH)
-  const bodyBlock    = bodyH > 0 ? bodyH + bodyMarginPx : 0
+  const bodyBlock  = bodyH > 0 ? bodyH + gapPx : 0
 
-  const tags       = Array.isArray(project.tags) ? project.tags : []
-  const tagsBlock  = tags.length ? tagsBlockHeight(tags, innerW) : 0
+  const tags      = Array.isArray(project.tags) ? project.tags : []
+  const tagsBlock = tags.length ? tagsBlockHeight(tags, innerW) : 0
 
   const full = titleBlock + bodyBlock + tagsBlock
   if (full <= textAreaH) {

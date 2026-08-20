@@ -1,10 +1,36 @@
+import { Fragment, useRef, useLayoutEffect } from 'react'
 import { Link } from 'react-router-dom'
 import LightSwitch from './LightSwitch'
 import LanguageSwitch from './LanguageSwitch'
+import { useNavReveal } from '../hooks/useNavReveal'
 
 export default function Nav({ theme, toggleTheme, language, onLanguageChange, copy, languageCopy }) {
+  const ref = useRef(null)
+  useNavReveal()
+
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const root = document.documentElement
+    // Publish once synchronously before paint, not only from the observer:
+    // page geometry (the header band's rest offset, the first snap position)
+    // reads --nav-h, so it must never be missing on the first frame — and a
+    // ResizeObserver's initial callback is not guaranteed to have run by
+    // then. The observer then keeps it current.
+    const publish = () => root.style.setProperty('--nav-h', `${el.offsetHeight}px`)
+    publish()
+    const observer = new ResizeObserver(publish)
+    observer.observe(el)
+    window.addEventListener('resize', publish)
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', publish)
+    }
+  }, [])
+
   return (
-    <header className="nav">
+    <Fragment>
+    <header className="nav" ref={ref}>
       <div className="wrap nav-inner">
         <div className="brand-wrap">
           <div className="logo" aria-hidden="true">
@@ -37,5 +63,7 @@ export default function Nav({ theme, toggleTheme, language, onLanguageChange, co
         </div>
       </div>
     </header>
+    <div className="nav-spacer" aria-hidden="true" />
+    </Fragment>
   )
 }

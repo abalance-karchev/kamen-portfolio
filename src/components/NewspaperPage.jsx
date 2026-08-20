@@ -14,7 +14,7 @@ import { motion as Motion, useScroll, useTransform } from 'motion/react'
   entrance animation and only has the exit (isFirst prop).
 */
 
-export default function NewspaperPage({ children, isFirst = false, tall = false }) {
+export default function NewspaperPage({ children, head, isFirst = false, id }) {
   const ref = useRef(null)
 
   const { scrollYProgress } = useScroll({
@@ -64,24 +64,31 @@ export default function NewspaperPage({ children, isFirst = false, tall = false 
     [1, 1, 2, 2, 3, 1])
 
   return (
-    <div ref={ref} className={`newspaper-page${tall ? ' newspaper-page--tall' : ''}`}>
-      <Motion.div
-        className="newspaper-page-inner"
-        style={{
-          rotateX,
-          rotateZ,
-          x,
-          y,
-          opacity,
-          scale,
-          zIndex,
-          position: 'relative',
-          transformPerspective: 1000,
-          transformOrigin: 'center center',
-        }}
-      >
-        {children}
-      </Motion.div>
+    <div ref={ref} id={id} className={`newspaper-page${isFirst ? ' newspaper-page--first' : ''}`}>
+      {/* The heading sits in flow above the stage and outside the motion
+          wrapper: the card-deck transform belongs to the article itself, and
+          a heading that tilted and slid with it would never settle into the
+          shared head space the layout is built around. */}
+      {head}
+      <div className="page-stage">
+        <Motion.div
+          className="newspaper-page-inner"
+          style={{
+            rotateX,
+            rotateZ,
+            x,
+            y,
+            opacity,
+            scale,
+            zIndex,
+            position: 'relative',
+            transformPerspective: 1000,
+            transformOrigin: 'center center',
+          }}
+        >
+          {children}
+        </Motion.div>
+      </div>
     </div>
   )
 }
