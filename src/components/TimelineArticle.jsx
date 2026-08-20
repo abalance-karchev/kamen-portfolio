@@ -54,8 +54,15 @@ export default function TimelineArticle({ copy }) {
     if (!article || !reel) return
 
     const onWheel = (e) => {
-      const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX
+      let delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX
       if (delta === 0) return
+      // Normalize to pixels: a physical mouse wheel reports deltaMode 1
+      // ("lines"), where deltaY is ~3, versus a trackpad's deltaMode 0
+      // ("pixels") already in the hundreds. Treating both the same way
+      // made wheel-driven scrolling read as far less sensitive than a
+      // trackpad's, so scale line/page deltas up to a comparable pixel range.
+      if (e.deltaMode === 1) delta *= 16
+      else if (e.deltaMode === 2) delta *= reel.clientWidth
       const max = reel.scrollWidth - reel.clientWidth
       if (max <= 1) return
       const pos = reel.scrollLeft
@@ -63,6 +70,9 @@ export default function TimelineArticle({ copy }) {
       const atEnd = pos >= max - 0.5
       if ((delta < 0 && atStart) || (delta > 0 && atEnd)) return
       e.preventDefault()
+      // scrollBy, not a direct `reel.scrollLeft +=` assignment: on this
+      // scroll-snap container a raw property write is silently dropped
+      // (reverted on the next frame) while scrollBy actually commits.
       reel.scrollBy({ left: delta, behavior: 'auto' })
     }
 
