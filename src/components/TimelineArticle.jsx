@@ -13,17 +13,26 @@ import FitBox from './FitBox'
  * vertical wheel input is translated into horizontal travel while there is
  * still reel left, and each card snaps.
  */
+// How long the reel must sit idle after the last wheel tick before it
+// settles to the nearest card. Long enough that a normal multi-tick scroll
+// gesture never gets interrupted by a mid-gesture snap.
+const SNAP_IDLE_MS = 160
+
 export default function TimelineArticle({ copy }) {
   const articleRef = useRef(null)
   const reelRef = useRef(null)
   const [index, setIndex] = useState(0)
   const checkpoints = copy.timeline
+  const snapTimerRef = useRef(null)
 
   const scrollToIndex = useCallback((i) => {
     const reel = reelRef.current
     if (!reel) return
     const clamped = Math.max(0, Math.min(checkpoints.length - 1, i))
-    reel.scrollTo({ left: clamped * reel.clientWidth, behavior: 'smooth' })
+    // scrollBy, not scrollTo: a `scrollTo` call on this reel was silently
+    // dropped — same underlying quirk as the direct `scrollLeft =`
+    // assignment noted below. scrollBy reliably commits.
+    reel.scrollBy({ left: clamped * reel.clientWidth - reel.scrollLeft, behavior: 'auto' })
   }, [checkpoints.length])
 
   // Track which card is centered, for the spine nodes.
@@ -71,14 +80,28 @@ export default function TimelineArticle({ copy }) {
       if ((delta < 0 && atStart) || (delta > 0 && atEnd)) return
       e.preventDefault()
       // scrollBy, not a direct `reel.scrollLeft +=` assignment: on this
-      // scroll-snap container a raw property write is silently dropped
-      // (reverted on the next frame) while scrollBy actually commits.
+      // container a raw property write was silently dropped (reverted on
+      // the next frame) while scrollBy actually commits.
       reel.scrollBy({ left: delta, behavior: 'auto' })
+
+      // Debounced settle: wait for the gesture to actually stop before
+      // snapping to the nearest card. CSS scroll-snap (even `proximity`)
+      // pulls toward a snap point as soon as motion pauses between wheel
+      // ticks, which reads as aggressive/jumpy during a deliberate slow
+      // scroll — so snapping is done here in JS, only once input goes idle.
+      clearTimeout(snapTimerRef.current)
+      snapTimerRef.current = setTimeout(() => {
+        const w = reel.clientWidth
+        if (w > 0) scrollToIndex(Math.round(reel.scrollLeft / w))
+      }, SNAP_IDLE_MS)
     }
 
     article.addEventListener('wheel', onWheel, { passive: false })
-    return () => article.removeEventListener('wheel', onWheel)
-  }, [])
+    return () => {
+      article.removeEventListener('wheel', onWheel)
+      clearTimeout(snapTimerRef.current)
+    }
+  }, [scrollToIndex])
 
   return (
     <Motion.section

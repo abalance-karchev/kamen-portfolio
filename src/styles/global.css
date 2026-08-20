@@ -1045,19 +1045,19 @@ html[data-viewclass="portrait"] .masthead { display: none; }
 }
 .tl-node:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
 
-/* The reel itself: one card per "page". Snap is `proximity`, and cards drop
-   `scroll-snap-stop`, on purpose: `mandatory` + `stop: always` forces the
-   browser to hard-halt at every single card mid-gesture, which turns the
-   wheel-hijack's continuous scrollBy calls into a stutter of jump-cuts
-   instead of a card physically sliding across. Proximity only nudges into
-   place once the motion settles, so the card travels the full distance. */
+/* The reel itself: one card per "page". No CSS scroll-snap here on
+   purpose — even `proximity` pulls toward a snap point as soon as motion
+   pauses between wheel ticks (browsers don't expose a way to tune that
+   threshold), which reads as aggressive/jumpy during a deliberate slow
+   scroll. Settling to the nearest card is instead handled in JS
+   (TimelineArticle's debounced scrollToIndex), only once the wheel
+   gesture actually goes idle. */
 .tl-reel {
   flex: 1 1 0;
   min-height: 0;
   display: flex;
   overflow-x: auto;
   overflow-y: hidden;
-  scroll-snap-type: x proximity;
   scrollbar-width: none;
   overscroll-behavior-x: contain;
 }
@@ -1067,7 +1067,6 @@ html[data-viewclass="portrait"] .masthead { display: none; }
   width: 100%;
   height: 100%;
   min-width: 0;
-  scroll-snap-align: start;
   gap: 1.2rem;
   align-items: stretch;
 }
