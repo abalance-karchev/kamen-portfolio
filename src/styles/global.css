@@ -19,6 +19,12 @@
   --primary-soft: #efb0aa;
   --accent: rgba(216,91,80,.12);
   --glow: rgba(216,91,80,.18);
+  /* "Currently working on" / important-callout accent (building-banner's
+     live dot). Light theme's primary is already this hue, so it's a no-op
+     here — the variable exists so components can reference --red in either
+     theme without a conditional. */
+  --red: #d85b50;
+  --red-soft: #efb0aa;
   --image-bg-a: #c05a00;
   --image-bg-mid: #e69323;
   --image-bg-b: #d2c185;
@@ -57,27 +63,37 @@
   --font-display: 'Instrument Serif', Georgia, serif;
   --font-prose: 'Instrument Serif', Georgia, serif;
   --font-tech: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --bg: #0d0d14;
-  --bg-2: #151625;
-  --paper: rgba(19,20,31,.82);
-  --paper-2: rgba(27,29,42,.76);
-  --paper-3: #24253a;
-  --text: #f3eff3;
-  --muted: #aba2af;
-  --line: rgba(243,239,243,.11);
-  --line-strong: rgba(243,239,243,.18);
-  /* Accent runs purple → blue. --primary-2 is the blue end and is deliberately
-     a mid blue, not the light blue: it carries white button text, and a lighter
-     end drops below WCAG AA. The genuinely light blue lives in --primary-soft,
-     which is only ever used for decoration and large text. */
-  --primary: #7c62f5;
-  --primary-2: #2b74c4;
-  --primary-soft: #8fd0ff;
-  --accent: rgba(124,98,245,.14);
-  --glow: rgba(124,98,245,.22);
-  --image-bg-a: #c000c0;
-  --image-bg-mid: #7d26b3;
-  --image-bg-b: #3c04a3;
+  /* Neutral gray, not the old purple-tinted near-black — bg/paper/muted below
+     are all true grays (R=G=B, or within a point of it) rather than carrying
+     a blue-violet cast, and sit ~10% lighter than the previous values. */
+  --bg: #232323;
+  --bg-2: #2b2b2b;
+  --paper: rgba(34,34,36,.82);
+  --paper-2: rgba(42,42,45,.76);
+  --paper-3: #38383c;
+  --text: #f2f1f1;
+  --muted: #a6a6a6;
+  --line: rgba(255,255,255,.11);
+  --line-strong: rgba(255,255,255,.18);
+  /* Accent runs blue → blue (no purple): --primary is the lighter/decorative
+     end (dots, gradient start), --primary-2 is deliberately a deeper blue
+     since it's the end that carries white button text — a lighter end there
+     drops below WCAG AA. --primary-soft is the periwinkle used only for
+     decoration and large text (pull-quote rule, never body copy). */
+  --primary: #5b84d6;
+  --primary-2: #3f6bc2;
+  --primary-soft: #9fbde8;
+  --accent: rgba(63,107,194,.14);
+  --glow: rgba(63,107,194,.22);
+  /* "Currently working on" / important-callout accent — used sparingly
+     (building-banner's live dot only, by design; see its rule for why). */
+  --red: #b04357;
+  --red-soft: #c9697a;
+  /* Portrait backdrop gradient — soft navy-to-periwinkle, not the old
+     magenta/purple. */
+  --image-bg-a: #14203c;
+  --image-bg-mid: #2f5490;
+  --image-bg-b: #7fa4dd;
   --shadow: 0 26px 70px rgba(0,0,0,.28);
   --shadow-lg: 0 48px 100px rgba(0,0,0,.36);
 }
@@ -730,8 +746,11 @@ html[data-viewclass="portrait"] .masthead { display: none; }
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: var(--primary-soft);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-soft) 26%, transparent);
+  /* The one deliberate red accent on the site: a "recording" dot for the
+     one thing that's genuinely live right now. Everything else stays blue —
+     see --red in the theme blocks. */
+  background: var(--red);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 26%, transparent);
 }
 .building-banner__status {
   flex-shrink: 0;
