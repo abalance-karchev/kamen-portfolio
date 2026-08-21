@@ -950,33 +950,42 @@ html[data-viewclass="portrait"] .masthead { display: none; }
 .article-head-slot > .smallcaps { flex: 0 0 auto; font-size: 15px; }
 .article-head-slot .article-title { letter-spacing: .05rem; }
 .article-head-slot .article-deck { max-width: none; }
-/* ── VIDEO PAGE ── video is the major region, text the minor column ── */
-.feature-article-pad {
+/* ── VIDEO PAGE ── stacked: head on top, video full-width in the middle,
+   body copy below. Deliberate exception to the golden-split layout other
+   articles use — a phi:1 side column cramps the video too narrow. ── */
+.feature-article-pad--stacked {
   flex: 1 1 auto;
   width: 100%;
   min-width: 0;
   min-height: 0;
-  gap: 1.35rem;
-  align-items: stretch;
+  padding: 1.35rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
-.feature-video-major {
+.feature-article-pad--stacked .feature-article-head {
+  flex: 0 0 15%;
+}
+.feature-video-wrap {
+  flex: 3 1 0;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.feature-video-major .video-frame {
+.feature-video-wrap .video-frame {
   width: 100%;
   max-height: 100%;
   aspect-ratio: 16 / 9;
 }
-.feature-text-minor {
+.feature-text-bottom {
+  flex: 1 1 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: .5rem;
-  padding-left: 1.35rem;
-  border-left: 1px solid var(--line-strong);
+  gap: .4rem;
 }
-.feature-text-minor .rule { flex: 0 0 auto; }
 .feature-body-copy { line-height: 1.6; color: var(--muted); }
 
 /* ── TIMELINE PAGE — horizontal reel ──
@@ -1886,13 +1895,8 @@ html[data-viewclass="portrait"] .masthead { display: none; }
   .glass .feature-article-head {
     flex: 0 0 14%;
   }
-  /* Timeline gets the bigger share of the video/timeline split here — video
-     height is capped by its own 16:9 aspect (doesn't need much of a narrow
-     portrait column's width), so it doesn't need equal footing with the
-     timeline for the window to reach the vertical-mode aspect ratio
-     (useTimelineLayout.js, ratio > 1.12). */
   .glass .feature-video-wrap {
-    flex: 0.8 1 0;
+    flex: 3 1 0;
     min-height: 0;
     width: 100%;
     margin-bottom: 0.45rem;
@@ -1902,17 +1906,6 @@ html[data-viewclass="portrait"] .masthead { display: none; }
     width: 100%;
     aspect-ratio: 16 / 9;
     height: auto;
-  }
-  .glass .timeline-section {
-    flex: 1.4 1 0;
-  }
-  .glass .feature-video-caption strong,
-  .glass .feature-video-caption span,
-  .glass .feature-video-caption .feature-body-copy,
-  .glass .checkpoint-content .smallcaps,
-  .glass .checkpoint-content h4,
-  .glass .checkpoint-content p {
-    margin: 0;
   }
   .glass .article-head .smallcaps {
     font-size: clamp(0.42rem, 1.4cqi, 0.52rem);
