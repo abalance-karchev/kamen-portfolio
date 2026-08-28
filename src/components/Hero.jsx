@@ -67,7 +67,7 @@ export default function Hero({ copy }) {
         transition={{ delay: .12 }}
       >
         <div className="major portrait glass">
-          <img className="portrait-img" src="/images/portrait-kamen-karchev.webp" alt={copy.portraitAlt} />
+          <img className="portrait-img" src="/images/proffesional_photo_better_edge_medium.png" alt={copy.portraitAlt} />
           <div className="caption">
             <strong>{copy.portraitName}</strong>
             <span>{copy.portraitMeta}</span>

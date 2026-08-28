@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion as Motion } from 'motion/react'
+import { animate } from 'motion'
 import FitBox from './FitBox'
 
 /**
@@ -13,26 +14,38 @@ import FitBox from './FitBox'
  * vertical wheel input is translated into horizontal travel while there is
  * still reel left, and each card snaps.
  */
-// How long the reel must sit idle after the last wheel tick before it
-// settles to the nearest card. Long enough that a normal multi-tick scroll
-// gesture never gets interrupted by a mid-gesture snap.
-const SNAP_IDLE_MS = 160
+// Each card has scroll-snap-stop: always, so while CSS snap is active *any*
+// nonzero scrollBy resolves instantly to a full card — there's no such thing
+// as a partial, visible slide. To get real physical scrolling, a wheel
+// gesture drops scroll-snap-type for its duration and drives reel.scrollLeft
+// directly (so the cards visibly track the wheel), then re-enables snap and
+// glides to whichever card is nearest once the gesture goes idle.
+// DRAG_GAIN < 1 is the "300% slower": the reel travels a quarter as far per
+// unit of wheel input, so it takes ~4x the scrolling to cross one card.
+const DRAG_GAIN = 0.25
+// A single physical mouse-wheel notch is one wheel event, not a stream —
+// the natural gap between notches on a slow, deliberate roll can comfortably
+// exceed 140ms, so a short idle window mistook "still scrolling, just
+// unhurried" for "done," settling mid-gesture and then immediately cancelling
+// when the next notch arrived (the stutter this constant fixes).
+const SETTLE_IDLE_MS = 320
+// A card only auto-completes into full view once it's within this fraction
+// of being there already (90%+ visible) — short of that, the gesture just
+// stops wherever it stopped, same as CSS scroll-snap-type: proximity.
+const SETTLE_SNAP_FRACTION = 0.10
+const SETTLE_SPRING = { type: 'spring', duration: 0.55, bounce: 0.28 }
 
 export default function TimelineArticle({ copy }) {
   const articleRef = useRef(null)
   const reelRef = useRef(null)
   const [index, setIndex] = useState(0)
   const checkpoints = copy.timeline
-  const snapTimerRef = useRef(null)
 
   const scrollToIndex = useCallback((i) => {
     const reel = reelRef.current
     if (!reel) return
     const clamped = Math.max(0, Math.min(checkpoints.length - 1, i))
-    // scrollBy, not scrollTo: a `scrollTo` call on this reel was silently
-    // dropped — same underlying quirk as the direct `scrollLeft =`
-    // assignment noted below. scrollBy reliably commits.
-    reel.scrollBy({ left: clamped * reel.clientWidth - reel.scrollLeft, behavior: 'auto' })
+    reel.scrollTo({ left: clamped * reel.clientWidth, behavior: 'smooth' })
   }, [checkpoints.length])
 
   // Track which card is centered, for the spine nodes.
@@ -62,16 +75,48 @@ export default function TimelineArticle({ copy }) {
     const reel = reelRef.current
     if (!article || !reel) return
 
+    let settleTimer = null
+    let dragging = false
+    let stopSpring = null
+
+    const settle = () => {
+      dragging = false
+      const w = reel.clientWidth
+      const maxIndex = Math.round((reel.scrollWidth - w) / w)
+      const idx = Math.floor(reel.scrollLeft / w)
+      const frac = reel.scrollLeft / w - idx
+
+      // Only auto-complete the move if the reel is already almost at the
+      // next (or back at the current) card — otherwise leave it be.
+      let target = null
+      if (frac <= SETTLE_SNAP_FRACTION) target = idx
+      else if (frac >= 1 - SETTLE_SNAP_FRACTION) target = idx + 1
+
+      if (target == null) {
+        // Deliberately does NOT restore scroll-snap-type here: re-enabling
+        // it while resting at a non-aligned position (this branch, by
+        // definition) makes the browser's own snap engine immediately
+        // force-correct to the nearest card on its own terms — silently
+        // overriding the 10%/90% decision just made above. It stays 'none'
+        // until the next drag or a completed commit re-arms it.
+        return
+      }
+
+      target = Math.max(0, Math.min(maxIndex, target))
+      // scroll-snap-type stays 'none' for the duration of the spring — restoring
+      // it earlier lets the mandatory/stop:always CSS snap resolve the move
+      // itself, instantly, fighting (and visually swallowing) this animation.
+      const controls = animate(reel.scrollLeft, target * w, {
+        ...SETTLE_SPRING,
+        onUpdate: (v) => { reel.scrollLeft = v },
+        onComplete: () => { reel.style.scrollSnapType = '' },
+      })
+      stopSpring = () => controls.stop()
+    }
+
     const onWheel = (e) => {
-      let delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX
+      const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX
       if (delta === 0) return
-      // Normalize to pixels: a physical mouse wheel reports deltaMode 1
-      // ("lines"), where deltaY is ~3, versus a trackpad's deltaMode 0
-      // ("pixels") already in the hundreds. Treating both the same way
-      // made wheel-driven scrolling read as far less sensitive than a
-      // trackpad's, so scale line/page deltas up to a comparable pixel range.
-      if (e.deltaMode === 1) delta *= 16
-      else if (e.deltaMode === 2) delta *= reel.clientWidth
       const max = reel.scrollWidth - reel.clientWidth
       if (max <= 1) return
       const pos = reel.scrollLeft
@@ -79,29 +124,26 @@ export default function TimelineArticle({ copy }) {
       const atEnd = pos >= max - 0.5
       if ((delta < 0 && atStart) || (delta > 0 && atEnd)) return
       e.preventDefault()
-      // scrollBy, not a direct `reel.scrollLeft +=` assignment: on this
-      // container a raw property write was silently dropped (reverted on
-      // the next frame) while scrollBy actually commits.
-      reel.scrollBy({ left: delta, behavior: 'auto' })
 
-      // Debounced settle: wait for the gesture to actually stop before
-      // snapping to the nearest card. CSS scroll-snap (even `proximity`)
-      // pulls toward a snap point as soon as motion pauses between wheel
-      // ticks, which reads as aggressive/jumpy during a deliberate slow
-      // scroll — so snapping is done here in JS, only once input goes idle.
-      clearTimeout(snapTimerRef.current)
-      snapTimerRef.current = setTimeout(() => {
-        const w = reel.clientWidth
-        if (w > 0) scrollToIndex(Math.round(reel.scrollLeft / w))
-      }, SNAP_IDLE_MS)
+      if (!dragging) {
+        dragging = true
+        stopSpring?.()
+        stopSpring = null
+        reel.style.scrollSnapType = 'none'
+      }
+      reel.scrollLeft = Math.max(0, Math.min(max, reel.scrollLeft + delta * DRAG_GAIN))
+
+      clearTimeout(settleTimer)
+      settleTimer = setTimeout(settle, SETTLE_IDLE_MS)
     }
 
     article.addEventListener('wheel', onWheel, { passive: false })
     return () => {
       article.removeEventListener('wheel', onWheel)
-      clearTimeout(snapTimerRef.current)
+      clearTimeout(settleTimer)
+      stopSpring?.()
     }
-  }, [scrollToIndex])
+  }, [])
 
   return (
     <Motion.section
