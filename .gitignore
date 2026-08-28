@@ -28,3 +28,10 @@ prompt.md
 v3plan.md
 portfolio_content_updates.md
 preview.html
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
