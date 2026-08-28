@@ -471,6 +471,7 @@ export const CONTENT = {
       links: [
         { to: '/', label: 'Home' },
         { href: '/#feature', label: 'Video / About' },
+        { href: '/#timeline', label: 'Timeline' },
         { href: '/#projects', label: 'Projects' },
         { to: '/freelance', label: 'Availability' },
         { href: '/#contact', label: 'Contact' },
@@ -617,6 +618,7 @@ export const CONTENT = {
       links: [
         { to: '/', label: 'Начало' },
         { href: '/#feature', label: 'Видео / За мен' },
+        { href: '/#timeline', label: 'Хронология' },
         { href: '/#projects', label: 'Проекти' },
         { to: '/freelance', label: 'Наличност' },
         { href: '/#contact', label: 'Контакти' },
