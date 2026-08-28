@@ -1,35 +1,66 @@
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap');
 
+/* ── Palette source: CV_and_application_materials/_Defaults/cv-golden-v2.html,
+   RED scheme (wine + blue). Coal is the shared neutral in both themes, same
+   as the CV; the 50/100/200 light end and the 200 dark-mode-muted step are
+   additions on top of the CV's own ladders, added so every semantic role
+   below (bg/paper layering, dark-mode text-on-dark, muted) has a shade to
+   use without borrowing the accent hue for a neutral job. Both themes'
+   accent is blue — wine is kept defined below (unused) since it's still
+   part of the CV's palette, in case it's wanted again later. ── */
+:root {
+  /* Coal — neutral, shared by both themes */
+  --coal-950: #0e1016;
+  --coal-900: #14171f;
+  --coal-850: #191d27;
+  --coal-800: #20242f;
+  --coal-700: #2b303d;
+  --coal-600: #3a4152;
+  /* added: light end, for text/muted that must sit on a dark (coal) surface */
+  --coal-200: #9aa0b0;
+  --coal-100: #dde0e8;
+  --coal-50:  #eef0f4;
+
+  /* Wine — unused for now, see note above */
+  --wine-700: #5b1c2a;
+  --wine-600: #762436;
+  --wine-500: #932f44;
+  --wine-400: #b04357;
+  --wine-300: #c9697a;
+
+  /* Blue — both themes' accent */
+  --blue-25:  #f7fafd;
+  --blue-50:  #eef4fa;
+  --blue-100: #e0eaf4;
+  --blue-200: #cbdcec;
+  --blue-400: #8aabc9;
+  --blue-600: #48678a;
+}
+
 /* Fluid type baseline ~20% smaller than prior (≈ old 100% zoom look at 80%). */
 :root, [data-theme="light"] {
   --font-display: 'Instrument Serif', Georgia, serif;
   --font-prose: 'Instrument Serif', Georgia, serif;
   --font-tech: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --bg: #f3e6d8;
-  --bg-2: #efd6b8;
-  --paper: rgba(255,250,247,.86);
-  --paper-2: rgba(244,225,219,.76);
-  --paper-3: #eed3cd;
-  --text: #14100f;
-  --muted: #5f4b47;
-  --line: rgba(20,16,15,.12);
-  --line-strong: rgba(20,16,15,.2);
-  --primary: #d85b50;
-  --primary-2: #bb4a4f;
-  --primary-soft: #efb0aa;
-  --accent: rgba(216,91,80,.12);
-  --glow: rgba(216,91,80,.18);
-  /* "Currently working on" / important-callout accent (building-banner's
-     live dot). Light theme's primary is already this hue, so it's a no-op
-     here — the variable exists so components can reference --red in either
-     theme without a conditional. */
-  --red: #d85b50;
-  --red-soft: #efb0aa;
-  --image-bg-a: #c05a00;
-  --image-bg-mid: #e69323;
-  --image-bg-b: #d2c185;
-  --shadow: 0 24px 60px rgba(112,58,52,.12);
-  --shadow-lg: 0 42px 90px rgba(112,58,52,.18);
+  --bg: var(--blue-50);
+  --bg-2: var(--blue-100);
+  --paper: rgba(247,250,253,.86);   /* blue-25 */
+  --paper-2: rgba(238,244,250,.76); /* blue-50 */
+  --paper-3: var(--blue-100);
+  --text: var(--coal-900);
+  --muted: var(--coal-600);
+  --line: rgba(20,23,31,.12);       /* coal-900 */
+  --line-strong: rgba(20,23,31,.2);
+  --primary: var(--blue-400);
+  --primary-2: var(--blue-600);
+  --primary-soft: var(--blue-200);
+  --accent: rgba(138,171,201,.12);  /* blue-400 */
+  --glow: rgba(138,171,201,.18);
+  --image-bg-a: var(--blue-600);
+  --image-bg-mid: var(--blue-400);
+  --image-bg-b: var(--blue-200);
+  --shadow: 0 24px 60px rgba(20,23,31,.12);
+  --shadow-lg: 0 42px 90px rgba(20,23,31,.18);
 }
 
 /* ── GOLDEN SPINE ──────────────────────────────────────────────────────────
@@ -63,39 +94,30 @@
   --font-display: 'Instrument Serif', Georgia, serif;
   --font-prose: 'Instrument Serif', Georgia, serif;
   --font-tech: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  /* Neutral gray, not the old purple-tinted near-black — bg/paper/muted below
-     are all true grays (R=G=B, or within a point of it) rather than carrying
-     a blue-violet cast, and sit ~10% lighter than the previous values. */
-  --bg: #232323;
-  --bg-2: #2b2b2b;
-  --paper: rgba(34,34,36,.82);
-  --paper-2: rgba(42,42,45,.76);
-  --paper-3: #38383c;
-  --text: #f2f1f1;
-  --muted: #a6a6a6;
-  --line: rgba(255,255,255,.11);
-  --line-strong: rgba(255,255,255,.18);
-  /* Accent runs blue → blue (no purple): --primary is the lighter/decorative
-     end (dots, gradient start), --primary-2 is deliberately a deeper blue
-     since it's the end that carries white button text — a lighter end there
-     drops below WCAG AA. --primary-soft is the periwinkle used only for
-     decoration and large text (pull-quote rule, never body copy). */
-  --primary: #5b84d6;
-  --primary-2: #3f6bc2;
-  --primary-soft: #9fbde8;
-  --accent: rgba(63,107,194,.14);
-  --glow: rgba(63,107,194,.22);
-  /* "Currently working on" / important-callout accent — used sparingly
-     (building-banner's live dot only, by design; see its rule for why). */
-  --red: #b04357;
-  --red-soft: #c9697a;
-  /* Portrait backdrop gradient — soft navy-to-periwinkle, not the old
-     magenta/purple. */
-  --image-bg-a: #14203c;
-  --image-bg-mid: #2f5490;
-  --image-bg-b: #7fa4dd;
-  --shadow: 0 26px 70px rgba(0,0,0,.28);
-  --shadow-lg: 0 48px 100px rgba(0,0,0,.36);
+  --bg: var(--coal-950);
+  --bg-2: var(--coal-900);
+  --paper: rgba(32,36,47,.82);   /* coal-800 */
+  --paper-2: rgba(25,29,39,.76); /* coal-850 */
+  --paper-3: var(--coal-700);
+  --text: var(--coal-50);
+  --muted: var(--coal-200);
+  --line: rgba(238,240,244,.11);       /* coal-50 */
+  --line-strong: rgba(238,240,244,.18);
+  /* Same blue as light mode, not wine — --primary-2 is the deeper end and
+     is deliberately darker than --primary, not lighter: it carries white
+     button text, and a lighter end drops below WCAG AA. The genuinely
+     light blue lives in --primary-soft, which is only ever used for
+     decoration and large text. */
+  --primary: var(--blue-400);
+  --primary-2: var(--blue-600);
+  --primary-soft: var(--blue-200);
+  --accent: rgba(138,171,201,.14); /* blue-400 */
+  --glow: rgba(138,171,201,.22);
+  --image-bg-a: var(--blue-600);
+  --image-bg-mid: var(--blue-400);
+  --image-bg-b: var(--blue-200);
+  --shadow: 0 26px 70px rgba(14,16,22,.28);   /* coal-950 */
+  --shadow-lg: 0 48px 100px rgba(14,16,22,.36);
 }
 
 :lang(bg) {
@@ -746,11 +768,8 @@ html[data-viewclass="portrait"] .masthead { display: none; }
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  /* The one deliberate red accent on the site: a "recording" dot for the
-     one thing that's genuinely live right now. Everything else stays blue —
-     see --red in the theme blocks. */
-  background: var(--red);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 26%, transparent);
+  background: var(--primary-soft);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-soft) 26%, transparent);
 }
 .building-banner__status {
   flex-shrink: 0;
@@ -1064,19 +1083,18 @@ html[data-viewclass="portrait"] .masthead { display: none; }
 }
 .tl-node:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
 
-/* The reel itself: one card per "page". No CSS scroll-snap here on
-   purpose — even `proximity` pulls toward a snap point as soon as motion
-   pauses between wheel ticks (browsers don't expose a way to tune that
-   threshold), which reads as aggressive/jumpy during a deliberate slow
-   scroll. Settling to the nearest card is instead handled in JS
-   (TimelineArticle's debounced scrollToIndex), only once the wheel
-   gesture actually goes idle. */
+/* The reel itself: one card per "page", snapped. */
 .tl-reel {
   flex: 1 1 0;
   min-height: 0;
   display: flex;
   overflow-x: auto;
   overflow-y: hidden;
+  /* proximity, not mandatory: native touch/scrollbar-drag scrolling should
+     only snap when already close to a card, matching the wheel-driven JS
+     path's own 10%-of-card-width settle threshold rather than forcing a
+     snap on every gesture regardless of distance. */
+  scroll-snap-type: x proximity;
   scrollbar-width: none;
   overscroll-behavior-x: contain;
 }
@@ -1086,6 +1104,8 @@ html[data-viewclass="portrait"] .masthead { display: none; }
   width: 100%;
   height: 100%;
   min-width: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
   gap: 1.2rem;
   align-items: stretch;
 }
@@ -1285,6 +1305,28 @@ html[data-viewclass="portrait"] .masthead { display: none; }
   flex-shrink: 0;
 }
 .mini-visual img { width: 100%; height: 100%; object-fit: cover; }
+.project-try-it {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  margin-top: .5rem;
+  padding: clamp(0.55rem, 0.4rem + 1cqh, 0.85rem) 1rem;
+  border-radius: 14px;
+  background: var(--accent-gradient);
+  color: white;
+  text-decoration: none;
+  text-align: center;
+  font-family: var(--font-tech);
+  font-weight: 800;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  font-size: clamp(0.8rem, 0.6rem + 1.4cqw, 1.1rem);
+  text-shadow: 0 1px 6px rgba(0,0,0,.35);
+  transition: filter .18s, transform .18s;
+}
+.project-try-it:hover { filter: brightness(1.12); transform: translateY(-1px); }
+
 .tags { display: flex; flex-wrap: wrap; gap: .45rem; }
 .tag {
   padding: clamp(0.224rem, 0.16rem + 0.32cqh, 0.272rem) clamp(0.4rem, 0.28rem + 0.64cqw, 0.496rem);
@@ -1686,7 +1728,9 @@ html[data-viewclass="portrait"] .masthead { display: none; }
   overflow: hidden;
   border-radius: 18px;
 }
-/* Inset clip rect — iframe is position:absolute so no flow gaps */
+/* Static screenshot, not a live-scaled iframe — a real render (backdrop-filter
+   blur, custom fonts, per-frame ResizeObserver scaling) was both off-center
+   and heavier than this small decorative teaser is worth. */
 .cv-preview-pane__scale-clip {
   position: absolute;
   top: 14px;
@@ -1695,15 +1739,9 @@ html[data-viewclass="portrait"] .masthead { display: none; }
   left: 14px;
   overflow: hidden;
   border-radius: 12px 12px 0 0;
-}
-.cv-preview-pane__iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: block;
-  border: none;
-  pointer-events: none;
-  margin: 0;
+  background-image: url('/images/cv-preview-bg.png');
+  background-size: cover;
+  background-position: center top;
 }
 .cv-preview-pane__fade {
   position: absolute;

@@ -21,16 +21,16 @@ const EN_TIMELINE = [
     image: '/images/TU-Varna.jpg',
   },
   {
-    year: 'Jun–Oct 2024',
+    year: 'Jun–Oct 2023',
     title: 'First season in the USA · Vermont Tent Company',
-    body: "Spent the summer working in Vermont's event and wedding industry — fully immersed in an English-speaking, multicultural team. Learned to be adaptable, resourceful, and independent far from home.",
+    body: "Spent the summer working in Vermont's event and wedding industry — fully immersed in an English-speaking, multicultural team. The first of three seasons, with two more following in 2024 and 2025. Learned to be adaptable, resourceful, and independent far from home.",
     image: '/images/vermont-tent-company.jpeg',
   },
   {
     year: '2023–2025',
     title: 'YouTube content creator',
     body: 'Built a monetised YouTube channel alongside university. One video testing the political biases of GPT-4 vs Gemini went viral with 200,000+ views — an early, hands-on exploration of LLM behaviour and science communication.',
-    image: '/images/research-projects.webp',
+    image: '/images/youtube-content-creator.jpg',
   },
   {
     year: '2024–2025',
@@ -40,7 +40,7 @@ const EN_TIMELINE = [
   },
   {
     year: 'May 2025 – now',
-    title: 'Second USA season, ISP internship & final year',
+    title: 'Third USA season, ISP internship & final year',
     body: 'Returned to Vermont (Jun–Oct 2025) — took on greater responsibilities and helped train new staff, building leadership and communication skills. Completed a network infrastructure internship at Asparuhovo Net (ISP operations, protocols, Cisco Packet Tracer). Now in the final stretch: building DopeyUserAPI (Elixir/Phoenix, PostgreSQL, Docker, Oban, Prometheus, Grafana) and graduating June 2026.',
     image: '/images/isp-work.jpg',
   },
@@ -68,6 +68,7 @@ const EN_PROJECTS = [
     bullets: ['Elixir/Phoenix REST API over PostgreSQL', 'Wikidata pipeline resolves flags by date', 'SVG territory rendering, client-side union geometry', 'Server-cached scenarios — computed once'],
     tags: ['Elixir', 'Phoenix', 'PostgreSQL', 'REST API', 'SVG', 'In progress'],
     link: 'https://github.com/KamenKarchev',
+    demoLink: 'https://rewritinghistory.net/',
   },
   {
     id: 'winery',
@@ -82,22 +83,34 @@ const EN_PROJECTS = [
   {
     id: 'shop-assist',
     title: 'ShopAssist',
-    value: 15,
+    value: 25,
     body: 'An ASP.NET web crawler that collects product listings from e-commerce sites, filters them against user-defined criteria, and ranks the best matches. An AI-based layer explains and scores results in natural language — making it easy to compare options without trawling through pages.',
     bullets: ['ASP.NET crawler for e-commerce product listings', 'Filters and ranks against user-defined criteria', 'AI layer scores and explains matches in plain language'],
     tags: ['C#', 'ASP.NET', 'Web scraping', 'AI', 'In progress'],
     link: '#',
     image: '/images/ShopAssist.jpg',
+    demoLink: 'https://shopassist-ae9026.azurewebsites.net/',
   },
   {
     id: 'dopey-user-api',
     title: 'DopeyUserAPI',
-    value: 25,
+    value: 15,
     body: 'A production-grade authentication and user management API built in Elixir/Phoenix. Covers registration, login, email verification, password reset, and OAuth social auth. Backed by PostgreSQL, containerised with Docker, uses Oban for background jobs, and ships with Prometheus + Grafana observability out of the box.',
     bullets: ['Production-grade auth and user management API', 'Registration, email verification, password reset, OAuth', 'Elixir/Phoenix + PostgreSQL, containerised with Docker', 'Oban background jobs, Prometheus + Grafana observability'],
     tags: ['Elixir', 'Phoenix', 'PostgreSQL', 'Docker', 'OAuth', 'Oban', 'Grafana'],
     link: 'https://github.com/KamenKarchev',
     image: '/images/DopeyAPI.jpg',
+  },
+  {
+    id: 'groupchat-ai',
+    title: 'GroupChatAI',
+    value: 20,
+    body: "An app that organizes an event for you: add the people you want to invite, and an LLM-driven matching engine picks the best venue and time from a directory of providers based on everyone's availability and preferences. The plan refines through a feedback loop until the organizer freezes it.",
+    bullets: ['LLM-driven matching engine picks venue and time', "Matches a provider directory against everyone's availability", 'Feedback loop refines the plan until the organizer freezes it', 'Python backend on Google Cloud services, hosted on Azure'],
+    tags: ['Python', 'LLM', 'Google Cloud', 'Azure'],
+    // TODO: replace with a GitHub repo link.
+    link: '#',
+    demoLink: 'https://groupchat-demo.kamen-karchev03.workers.dev/',
   },
   {
     id: 'pipe-prompt',
@@ -223,16 +236,16 @@ const BG_TIMELINE = [
     image: '/images/TU-Varna.jpg',
   },
   {
-    year: 'юни–окт 2024',
+    year: 'юни–окт 2023',
     title: 'Първи сезон в САЩ · Vermont Tent Company',
-    body: 'Прекарах лятото работейки в събитийната индустрия на Върмонт — напълно потопен в англоговорящ, мултикултурен екип. Научих се на адаптивност, находчивост и самостоятелност далеч от дома.',
+    body: 'Прекарах лятото работейки в събитийната индустрия на Върмонт — напълно потопен в англоговорящ, мултикултурен екип. Първият от три сезона, последван от още два — през 2024 и 2025. Научих се на адаптивност, находчивост и самостоятелност далеч от дома.',
     image: '/images/vermont-tent-company.jpeg',
   },
   {
     year: '2023–2025',
     title: 'Създател на съдържание в YouTube',
     body: 'Изградих монетизиран YouTube канал успоредно с университета. Едно видео, сравняващо политическите пристрастия на GPT-4 и Gemini, стана вирусно с над 200 000 гледания — ранен практически поглед към поведението на LLM и научната комуникация.',
-    image: '/images/research-projects.webp',
+    image: '/images/youtube-content-creator.jpg',
   },
   {
     year: '2024–2025',
@@ -242,7 +255,7 @@ const BG_TIMELINE = [
   },
   {
     year: 'май 2025 – сега',
-    title: 'Втори сезон в САЩ, ISP стаж и последна година',
+    title: 'Трети сезон в САЩ, ISP стаж и последна година',
     body: 'Завърнах се във Върмонт (юни–окт 2025) — поех повече отговорности и обучавах нови кадри. Завърших стаж по мрежова инфраструктура в Аспарухово Нет (ISP операции, протоколи, Cisco Packet Tracer). Сега на финалната права: изграждам DopeyUserAPI (Elixir/Phoenix, PostgreSQL, Docker, Oban, Prometheus, Grafana) и се дипломирам през юни 2026.',
     image: '/images/isp-work.jpg',
   },
@@ -257,6 +270,7 @@ const BG_PROJECTS = [
     bullets: ['Elixir/Phoenix REST API върху PostgreSQL', 'Wikidata pipeline извлича знамена по дата', 'SVG рендериране на територии, обединения от страна на клиента', 'Кеширани сценарии — изчисляват се веднъж'],
     tags: ['Elixir', 'Phoenix', 'PostgreSQL', 'REST API', 'SVG', 'В процес'],
     link: 'https://github.com/KamenKarchev',
+    demoLink: 'https://rewritinghistory.net/',
   },
   {
     id: 'winery',
@@ -271,22 +285,34 @@ const BG_PROJECTS = [
   {
     id: 'shop-assist',
     title: 'ShopAssist',
-    value: 15,
+    value: 25,
     body: 'ASP.NET web crawler, който събира продуктови обяви от онлайн магазини, филтрира ги по зададени критерии и класира най-добрите съвпадения. AI слой обяснява и оценява резултатите на естествен език — улеснявайки сравняването на опции без лутане из страниците.',
     bullets: ['ASP.NET crawler за продуктови обяви', 'Филтрира и класира по зададени критерии', 'AI слой оценява и обяснява резултатите'],
     tags: ['C#', 'ASP.NET', 'Web scraping', 'AI', 'В разработка'],
     link: '#',
     image: '/images/ShopAssist.jpg',
+    demoLink: 'https://shopassist-ae9026.azurewebsites.net/',
   },
   {
     id: 'dopey-user-api',
     title: 'DopeyUserAPI',
-    value: 25,
+    value: 15,
     body: 'Production-grade API за автентикация и управление на потребители, изграден с Elixir/Phoenix. Покрива регистрация, логин, email верификация, смяна на парола и OAuth. Поддържан от PostgreSQL, контейнеризиран с Docker, използва Oban за background jobs и идва с готова Prometheus + Grafana интеграция.',
     bullets: ['Production-grade API за автентикация и потребители', 'Регистрация, email верификация, смяна на парола, OAuth', 'Elixir/Phoenix + PostgreSQL, контейнеризиран с Docker', 'Oban background jobs, Prometheus + Grafana'],
     tags: ['Elixir', 'Phoenix', 'PostgreSQL', 'Docker', 'OAuth', 'Oban', 'Grafana'],
     link: 'https://github.com/KamenKarchev',
     image: '/images/DopeyAPI.jpg',
+  },
+  {
+    id: 'groupchat-ai',
+    title: 'GroupChatAI',
+    value: 20,
+    body: 'Приложение, което организира събитие вместо теб: добавяш хората, които искаш да поканиш, а LLM-базиран matching engine избира най-добрата локация и час от директория с доставчици въз основа на наличността и предпочитанията на всички. Планът се усъвършенства чрез feedback loop, докато организаторът не го финализира.',
+    bullets: ['LLM-базиран matching engine избира локация и час', 'Съпоставя директория с доставчици спрямо наличността на всички', 'Feedback loop усъвършенства плана до финализиране от организатора', 'Python backend в Google Cloud, хостван в Azure'],
+    tags: ['Python', 'LLM', 'Google Cloud', 'Azure'],
+    // TODO: замени с линк към GitHub repo.
+    link: '#',
+    demoLink: 'https://groupchat-demo.kamen-karchev03.workers.dev/',
   },
   {
     id: 'pipe-prompt',
@@ -453,8 +479,8 @@ export const CONTENT = {
     languageSwitch: {
       currentLabel: 'Current language',
       options: {
-        en: { code: 'EN', name: 'English', flag: '🇬🇧' },
-        bg: { code: 'BG', name: 'Bulgarian', flag: '🇧🇬' },
+        en: { code: 'EN', name: 'English', flag: '\uD83C\uDDEC\uD83C\uDDE7' },
+        bg: { code: 'BG', name: 'Bulgarian', flag: '\uD83C\uDDE7\uD83C\uDDEC' },
       },
       ariaLabel: {
         en: 'Switch language to English',
@@ -515,6 +541,7 @@ export const CONTENT = {
       title: 'Projects sized by importance.',
       deck: 'Arranged like a portfolio heatmap — the most substantial work gets the most space; nothing gets dropped.',
       items: EN_PROJECTS,
+      tryItLabel: 'Try it!',
     },
     freelance: {
       eyebrow: 'Availability',
@@ -565,7 +592,7 @@ export const CONTENT = {
       title: 'Final-year student, open to roles where the work actually matters.',
       deck: "Graduating TU Varna in June 2026. I work with Elixir, Java, Kotlin, C#, and React. I'm looking for roles where I can keep building real things. Reach out through any channel below.",
       items: EN_CONTACT,
-      cvHref: 'https://kamenkarchev.com/cv',
+      cvHref: '/documents/CV_Kamen_Karchev_EN.pdf',
       certificates: {
         title: 'Certificates',
         ariaLabel: 'Certificates and diplomas',
@@ -598,8 +625,8 @@ export const CONTENT = {
     languageSwitch: {
       currentLabel: 'Текущ език',
       options: {
-        en: { code: 'EN', name: 'Английски', flag: '🇬🇧' },
-        bg: { code: 'BG', name: 'Български', flag: '🇧🇬' },
+        en: { code: 'EN', name: 'Английски', flag: '\uD83C\uDDEC\uD83C\uDDE7' },
+        bg: { code: 'BG', name: 'Български', flag: '\uD83C\uDDE7\uD83C\uDDEC' },
       },
       ariaLabel: {
         en: 'Превключи езика на английски',
@@ -701,13 +728,14 @@ export const CONTENT = {
       title: 'Проекти, оразмерени по значение.',
       deck: 'Подредени като portfolio heatmap — най-значимата работа получава най-много място; нищо не отпада от мрежата.',
       items: BG_PROJECTS,
+      tryItLabel: 'Пробвай!',
     },
     contact: {
       eyebrow: 'Последна страница',
       title: 'Студент в последна година, отворен към роли, където работата наистина има значение.',
       deck: 'Дипломирам се в ТУ Варна през юни 2026. Работя с Elixir, Java, Kotlin, C# и React. Търся роли, където мога да продължа да изграждам реални продукти. Свържи се с мен чрез каналите по-долу.',
       items: BG_CONTACT,
-      cvHref: 'https://kamenkarchev.com/cv',
+      cvHref: '/documents/CV_Kamen_Karchev_BG.pdf',
       certificates: {
         title: 'Сертификати',
         ariaLabel: 'Сертификати и дипломи',

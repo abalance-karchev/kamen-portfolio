@@ -4,8 +4,6 @@ import { AnimatePresence, motion as Motion } from 'motion/react'
 import FitBox from './FitBox'
 import ArticleHead from './ArticleHead'
 
-/* Must match .page width in public/cv-preview.html (210mm ≈ 794px) */
-const CV_NATURAL_W = 794
 
 /* ── Brand icons ── */
 const LinkedInIcon = () => (
@@ -234,28 +232,6 @@ function CertificatesExpandable({ item, certs, index }) {
 }
 
 export default function ContactArticle({ copy }) {
-  const clipRef = useRef(null)
-  const [layout, setLayout] = useState(() => ({
-    scale: 1,
-    iframeH: 900,
-  }))
-
-  useEffect(() => {
-    const el = clipRef.current
-    if (!el) return
-    const update = () => {
-      const w = el.offsetWidth
-      const h = el.offsetHeight
-      if (w < 1 || h < 1) return
-      const scale = w / CV_NATURAL_W
-      setLayout({ scale, iframeH: h / scale })
-    }
-    update()
-    const ro = new ResizeObserver(update)
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
-
   return (
     <Motion.section
       className="glass contact-article golden-rect"
@@ -320,28 +296,13 @@ export default function ContactArticle({ copy }) {
                 className="cv-preview-pane"
                 target="_blank"
                 rel="noreferrer"
-                aria-label="Open full CV on kamenkarchev.com"
+                aria-label="Open full CV (PDF)"
                 whileHover={{ y: -6, scale: 1.012 }}
                 whileTap={{ scale: 0.99 }}
                 transition={{ duration: .22, ease: [.16, 1, .3, 1] }}
               >
                 <div className="cv-preview-pane__scaler-wrap">
-                  <div ref={clipRef} className="cv-preview-pane__scale-clip">
-                    <iframe
-                      className="cv-preview-pane__iframe"
-                      src="/cv-preview.html"
-                      scrolling="no"
-                      tabIndex={-1}
-                      aria-hidden="true"
-                      title=""
-                      style={{
-                        width: CV_NATURAL_W,
-                        height: layout.iframeH,
-                        transform: `scale(${layout.scale})`,
-                        transformOrigin: 'top left',
-                      }}
-                    />
-                  </div>
+                  <div className="cv-preview-pane__scale-clip" aria-hidden="true" />
                 </div>
                 <div className="cv-preview-pane__fade" aria-hidden="true" />
                 <div className="cv-preview-pane__cta" aria-hidden="true">
@@ -349,7 +310,7 @@ export default function ContactArticle({ copy }) {
                   <div className="cv-preview-pane__cta-body">
                     <span className="cv-preview-pane__cta-label">CV</span>
                     <span className="cv-preview-pane__cta-text">Click to view my full CV</span>
-                    <span className="cv-preview-pane__cta-desc">kamenkarchev.com/cv</span>
+                    <span className="cv-preview-pane__cta-desc">Download PDF</span>
                   </div>
                 </div>
               </Motion.a>

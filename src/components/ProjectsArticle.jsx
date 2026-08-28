@@ -121,6 +121,8 @@ export default function ProjectsArticle({ copy }) {
                   body={p.body}
                   bullets={p.bullets}
                   tags={p.tags}
+                  demoLink={p.demoLink}
+                  tryItLabel={copy.tryItLabel}
                 />
               </div>
             )
