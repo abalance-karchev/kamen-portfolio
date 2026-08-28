@@ -5,12 +5,24 @@ export function useScrollTuning() {
   // browser restoring a previous scroll position, and mandatory snapping
   // resolving an initial 0 to the *page's* snap position one nav-height
   // down — skipping the "menu + masthead + front page" opening view
-  // entirely. Skipped when the URL targets an anchor.
+  // entirely.
+  //
+  // A URL landing on an anchor (e.g. /#projects) needs its own handling
+  // rather than deferring to the browser's native fragment scroll: on first
+  // load this is a client-rendered SPA, so the target section doesn't exist
+  // in the DOM yet when the browser processes the URL fragment, and nothing
+  // retries the jump once React mounts it. Doing it here, once the section
+  // is actually in the DOM, is what makes every /#<section-id> link work.
   useEffect(() => {
-    if (window.location.hash) return
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual'
     }
-    window.scrollTo(0, 0)
+    const hash = window.location.hash.slice(1)
+    const target = hash && document.getElementById(hash)
+    if (target) {
+      target.scrollIntoView({ behavior: 'auto', block: 'start' })
+    } else {
+      window.scrollTo(0, 0)
+    }
   }, [])
 }
